@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name      = 'WisdomNetwork'
-  s.version   = '0.1.0'
+  s.version   = '0.0.1'
   s.license   = { :type => "MIT", :file => "LICENSE" }
   s.authors   = { 'tangjianfeng' => '497609288@qq.com' }
   s.homepage  = 'https://github.com/tangjianfengVS/WisdomNetwork'
