@@ -31,14 +31,18 @@ public struct WisdomNetworkRequest {
     // - message      : String
     // - responseData : Any
     // - asyncTime    : TimeInterval 异步延迟
-    public let debugData: (code: NSInteger, message: String, responseData: Any, asyncTime: TimeInterval)?
+    public let debugData: (code: NSInteger,
+                           message: String,
+                           responseData: Any,
+                           timestamp: NSInteger,
+                           asyncTime: TimeInterval)?
     
     /* url path 路径 初始化 */
     public init(path: String,
                 method: WisdomNetworkMethod,
                 parameters: [String:Any],
                 headers: [String:String]?=nil,
-                debugData: (code: NSInteger, message: String, responseData: Any, asyncTime: TimeInterval)?=nil,
+                debugData: (code: NSInteger, message: String, responseData: Any, timestamp: NSInteger, asyncTime: TimeInterval)?=nil,
                 responseable: WisdomNetworkResponseable.Type?=nil,
                 desc: String="") {
         if let baseURL = WisdomNetworkCore.baseURL, baseURL.count > 0{
@@ -63,7 +67,7 @@ public struct WisdomNetworkRequest {
                 method: WisdomNetworkMethod,
                 parameters: [String:Any],
                 headers: [String:String]?=nil,
-                debugData: (code: NSInteger, message: String, responseData: Any, asyncTime: TimeInterval)?=nil,
+                debugData: (code: NSInteger, message: String, responseData: Any, timestamp: NSInteger, asyncTime: TimeInterval)?=nil,
                 responseable: WisdomNetworkResponseable.Type?=nil,
                 desc: String="") {
         url = Self.getUrl(baseUrl: baseUrl, urlPath: path)

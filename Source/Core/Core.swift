@@ -19,6 +19,8 @@ struct WisdomNetworkCore {
     
     /* network timeout interval for request */
     private(set) static var timeoutIntervalForRequest: TimeInterval = 45
+    
+    private(set) static var openLog = true
 
     
     /* network requestable */
@@ -78,19 +80,23 @@ struct WisdomNetworkCore {
             Alamofire.AF.sessionConfiguration.timeoutIntervalForRequest = Self.timeoutIntervalForRequest
             Alamofire.AF.sessionConfiguration.headers = .default
             
-            print("❤️--------- WisdomNetwork - Request - Start ---------❤️")
-            print(request)
-            print("----------------------------------------------------")
+            if Self.openLog {
+                print("❤️❤️------- WisdomNetwork - Request - Start -------❤️❤️")
+                print(request)
+                print("-------------------------------------------------------")
+            }
             #if DEBUG
             if let debugData = request.debugData {
                 DispatchQueue.main.asyncAfter(deadline: DispatchTime.now()+debugData.asyncTime, execute: {
-                    print("✅-------- WisdomNetwork - DebugData - Success --------✅")
-                    print(debugData)
-                    print("-----------------------------------------------------")
+                    if Self.openLog {
+                        print("✅-------- WisdomNetwork - DebugData - Success --------✅")
+                        print(debugData)
+                        print("---------------------------------------------------------")
+                    }
                     if debugData.code < 0 {
-                        failedClosure(debugData.code, debugData.message, "\(debugData.responseData)", 0)
+                        failedClosure(debugData.code, debugData.message, "\(debugData.responseData)", debugData.timestamp)
                     }else {
-                        result(code: debugData.code, msg: debugData.message, data: debugData.responseData, timestamp: 0)
+                        result(code: debugData.code, msg: debugData.message, data: debugData.responseData, timestamp: debugData.timestamp)
                     }
                 })
                 return nil
@@ -100,9 +106,11 @@ struct WisdomNetworkCore {
                 
                 switch dataResponse.result {
                 case .failure(let afError):
-                    print("❌--------- WisdomNetwork - Response - Error --------❌")
-                    print(afError)
-                    print("----------------------------------------------------")
+                    if Self.openLog {
+                        print("❌-------- WisdomNetwork - Response - Error --------❌")
+                        print(afError)
+                        print("------------------------------------------------------")
+                    }
                     var error = afError.errorDescription ?? ""
                     if "\(afError)".contains("Code=-1020") || "\(afError)".contains("Code=-1009") {
                         error = "网络连接错误，请检查网络"
@@ -131,9 +139,11 @@ struct WisdomNetworkCore {
                     }
                     for error in WisdomNetworkErrorStauts.allCases {
                         if error.rawValue == codeValue {
-                            print("❌--------- WisdomNetwork - Response - Error --------❌")
-                            print(dictResponse)
-                            print("----------------------------------------------------")
+                            if Self.openLog {
+                                print("❌-------- WisdomNetwork - Response - Error --------❌")
+                                print(dictResponse)
+                                print("------------------------------------------------------")
+                            }
                             if request.responseable != nil || Self.responseable != nil {
                                 var processed = false
                                 // request -> responseable
@@ -157,23 +167,27 @@ struct WisdomNetworkCore {
                         }
                     }
                     result(code: codeValue, msg: msg ?? "", data: data as Any, timestamp: timestamp) { res in
-                        if res {
-                            print("✅-------- WisdomNetwork - Response - Success --------✅")
-                            print(dictResponse)
-                            print("----------------------------------------------------")
-                        }else {
-                            print("❌--------- WisdomNetwork - Response - Error --------❌")
-                            print(dictResponse)
-                            print("----------------------------------------------------")
+                        if Self.openLog {
+                            if res {
+                                print("✅-------- WisdomNetwork - Response - Success --------✅")
+                                print(dictResponse)
+                                print("--------------------------------------------------------")
+                            }else {
+                                print("❌-------- WisdomNetwork - Response - Error --------❌")
+                                print(dictResponse)
+                                print("------------------------------------------------------")
+                            }
                         }
                     }
                 }
             }
             return dataRequest
         }else {
-            print("❌--------- WisdomNetwork - Request - Error ---------❌")
-            print("url init failed: "+"url error: "+request.url)
-            print("----------------------------------------------------")
+            if Self.openLog {
+                print("❌-------- WisdomNetwork - Request - Error --------❌")
+                print("url init failed: "+"url error: "+request.url)
+                print("-----------------------------------------------------")
+            }
             failedClosure(-1, "url init failed", "url error: "+request.url, 0)
         }
         return nil
@@ -206,6 +220,10 @@ extension WisdomNetworkCore: WisdomNetworkSetable {
     
     static func setNetwork(requestTimeoutInterval: TimeInterval)  {
         Self.timeoutIntervalForRequest = requestTimeoutInterval
+    }
+    
+    static func setNetwork(openLog: Bool) {
+        Self.openLog = openLog
     }
 }
 

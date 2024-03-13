@@ -51,7 +51,7 @@ public protocol WisdomNetworkable {
     // - message      : String
     // - responseData : Any
     // - asyncTime    : TimeInterval 异步延迟
-    var debugData: (code: NSInteger, message: String, responseData: Any, asyncTime: TimeInterval)? { get }
+    var debugData: (code: NSInteger, message: String, responseData: Any, timestamp: NSInteger, asyncTime: TimeInterval)? { get }
 }
 
 
@@ -69,7 +69,7 @@ public extension WisdomNetworkable {
     
     //var responseable: CNetworkResponseable.Type? { nil }
     
-    var debugData: (code: NSInteger, message: String, responseData: Any, asyncTime: TimeInterval)? { nil }
+    var debugData: (code: NSInteger, message: String, responseData: Any, timestamp: NSInteger, asyncTime: TimeInterval)? { nil }
 }
 
 
@@ -79,7 +79,9 @@ protocol WisdomNetworkSetable {
 
     static func setNetwork(responseable: WisdomNetworkResponseable.Type)
     
-    static func setNetwork(requestTimeoutInterval: TimeInterval) 
+    static func setNetwork(requestTimeoutInterval: TimeInterval)
+    
+    static func setNetwork(openLog: Bool)
 }
 
 

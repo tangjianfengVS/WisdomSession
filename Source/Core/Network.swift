@@ -115,6 +115,13 @@ extension WisdomNetwork: WisdomNetworkSetable {
     public static func setNetwork(requestTimeoutInterval: TimeInterval) {
         WisdomNetworkCore.setNetwork(requestTimeoutInterval: requestTimeoutInterval)
     }
+    
+    // MARK: 配置显示 请求日志
+    /// - Parameters:
+    ///   - openLog: Bool （默认开启 openLog == true）
+    public static func setNetwork(openLog: Bool) {
+        WisdomNetworkCore.setNetwork(openLog: openLog)
+    }
 }
 
 extension WisdomNetwork: WisdomNetworkEncoderable {
