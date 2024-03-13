@@ -5,9 +5,9 @@ Pod::Spec.new do |s|
   s.authors   = { 'tangjianfeng' => '497609288@qq.com' }
   s.homepage  = 'https://github.com/tangjianfengVS/WisdomNetwork'
   s.source    = { :git => 'https://github.com/tangjianfengVS/WisdomNetwork.git', :tag => s.version }
-  s.summary   = 'Based on 'Kingfisher' library, encapsulated network framework library'
+  s.summary   = 'Based on 【Kingfisher】 library, encapsulated network framework library'
 
-  s.description   = 'Based on 'Kingfisher' library, encapsulated network framework library(基于 Kingfisher 库，封装的网络框架库).'
+  s.description   = 'Based on 【Kingfisher】 library, encapsulated network framework library(基于 Kingfisher 库，封装的网络框架库).'
 
   s.platform      = :ios, '12.0'
   s.swift_version = ['5.5', '5.6', '5.7', '5.8.1']
