@@ -1,0 +1,14 @@
+# Uncomment the next line to define a global platform for your project
+platform :ios, '13.0'
+use_frameworks!
+
+workspace 'WisdomNetworkDemo.xcworkspace'
+
+target 'WisdomNetworkDemo' do
+  # Comment the next line if you don't want to use dynamic frameworks
+
+  # Pods for WisdomNetworkDemo
+  pod 'Alamofire', '5.8.0'
+
+  pod 'WisdomNetwork', :path=>"/Users/qmlt/Desktop/jianfeng/github/WisdomNetwork/"
+end
