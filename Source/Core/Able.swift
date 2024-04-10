@@ -12,7 +12,7 @@ import Foundation
 public protocol WisdomNetworkResponseable {
     
     // 响应 Error 统一处理
-    static func response(code: NSInteger, message: String, responseData: Any, timestamp: NSInteger)->WisdomNetworkFailed?
+    static func response(code: NSInteger, message: String, responseData: Any)->WisdomNetworkFailed?
 }
 
 
@@ -51,7 +51,7 @@ public protocol WisdomNetworkable {
     // - message      : String
     // - responseData : Any
     // - asyncTime    : TimeInterval 异步延迟
-    var debugData: (code: NSInteger, message: String, responseData: Any, timestamp: NSInteger, asyncTime: TimeInterval)? { get }
+    var debugData: (code: NSInteger, message: String, responseData: Any, asyncTime: TimeInterval)? { get }
 }
 
 
@@ -69,7 +69,7 @@ public extension WisdomNetworkable {
     
     //var responseable: CNetworkResponseable.Type? { nil }
     
-    var debugData: (code: NSInteger, message: String, responseData: Any, timestamp: NSInteger, asyncTime: TimeInterval)? { nil }
+    var debugData: (code: NSInteger, message: String, responseData: Any, asyncTime: TimeInterval)? { nil }
 }
 
 

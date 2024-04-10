@@ -24,13 +24,13 @@ public enum WisdomNetworkStatus {
 }
 
 /* 1.code: 响应码  2.message: 响应信息  3.responseData: 响应数据 */
-public typealias WisdomNetworkSucceedClosure = (_ code: NSInteger, _ message: String, _ responseData: Any, _ timestamp: NSInteger)->()
+public typealias WisdomNetworkSucceedClosure = (_ code: NSInteger, _ message: String, _ responseData: Any)->()
 
 /* 1.code: 错误码  2.message: 错误信息  3.rawResponseString: 原始信息 */
-public typealias WisdomNetworkFailedClosure = (_ code: NSInteger, _ message: String, _ rawResponseString: String, _ timestamp: NSInteger)->()
+public typealias WisdomNetworkFailedClosure = (_ code: NSInteger, _ message: String, _ rawResponseString: String)->()
 
 /* 1.code: 错误码  2.message: 错误信息 */
-public typealias WisdomNetworkFailed = (code: NSInteger, message: String, timestamp: NSInteger)
+public typealias WisdomNetworkFailed = (code: NSInteger, message: String)
 
 
 public class WisdomNetwork: WisdomNetworkInfoable {

@@ -45,28 +45,28 @@ struct WisdomNetworkCore {
                         succeedClosure: @escaping WisdomNetworkSucceedClosure,
                         failedClosure: @escaping WisdomNetworkFailedClosure)->DataRequest? {
         
-        func result(code: NSInteger, msg: String, data: Any, timestamp: NSInteger, resultClosure: ((Bool)->())?=nil){
+        func result(code: NSInteger, msg: String, data: Any, resultClosure: ((Bool)->())?=nil){
             if request.responseable != nil || Self.responseable != nil {
                 var processed = false
                 // request -> responseable
-                if let able = request.responseable, let failed = able.response(code: code, message: msg, responseData: data, timestamp: timestamp) {
+                if let able = request.responseable, let failed = able.response(code: code, message: msg, responseData: data) {
                     processed = true
                     resultClosure?(false)
-                    failedClosure(failed.code, failed.message, "\(data)", failed.timestamp)
+                    failedClosure(failed.code, failed.message, "\(data)")
                 }
                 // 全局 -> responseable
-                if let able = Self.responseable, let failed = able.response(code: code, message: msg, responseData: data, timestamp: timestamp) {
+                if let able = Self.responseable, let failed = able.response(code: code, message: msg, responseData: data) {
                     processed = true
                     resultClosure?(false)
-                    failedClosure(failed.code, failed.message, "\(data)", failed.timestamp)
+                    failedClosure(failed.code, failed.message, "\(data)")
                 }
                 if processed==false {
                     resultClosure?(true)
-                    succeedClosure(code, msg, data, timestamp)
+                    succeedClosure(code, msg, data)
                 }
             }else {
                 resultClosure?(true)
-                succeedClosure(code, msg, data, timestamp)
+                succeedClosure(code, msg, data)
             }
         }
         
@@ -94,9 +94,9 @@ struct WisdomNetworkCore {
                         print("---------------------------------------------------------")
                     }
                     if debugData.code < 0 {
-                        failedClosure(debugData.code, debugData.message, "\(debugData.responseData)", debugData.timestamp)
+                        failedClosure(debugData.code, debugData.message, "\(debugData.responseData)")
                     }else {
-                        result(code: debugData.code, msg: debugData.message, data: debugData.responseData, timestamp: debugData.timestamp)
+                        result(code: debugData.code, msg: debugData.message, data: debugData.responseData)
                     }
                 })
                 return nil
@@ -119,7 +119,7 @@ struct WisdomNetworkCore {
                     }else {
                         error = "网络请求失败，请稍后重试"
                     }
-                    failedClosure(afError.responseCode ?? -1, error, "\(afError)", 0)
+                    failedClosure(afError.responseCode ?? -1, error, "\(afError)")
                 case .success(let data):
                     let dictResponse = encoderDict(data: data)
                     let data = dictResponse["data"] ?? ""
@@ -147,26 +147,26 @@ struct WisdomNetworkCore {
                             if request.responseable != nil || Self.responseable != nil {
                                 var processed = false
                                 // request -> responseable
-                                if let able = request.responseable, let failed = able.response(code: codeValue, message: msg ?? "", responseData: data, timestamp: timestamp) {
+                                if let able = request.responseable, let failed = able.response(code: codeValue, message: msg ?? "", responseData: data) {
                                     processed = true
-                                    failedClosure(failed.code, failed.message, "\(data)", failed.timestamp)
+                                    failedClosure(failed.code, failed.message, "\(data)")
                                 }
                                 // 全局 -> responseable
-                                if let able = Self.responseable, let failed = able.response(code: codeValue, message: msg ?? "", responseData: data, timestamp: timestamp) {
+                                if let able = Self.responseable, let failed = able.response(code: codeValue, message: msg ?? "", responseData: data) {
                                     processed = true
-                                    failedClosure(failed.code, failed.message, "\(data)", failed.timestamp)
+                                    failedClosure(failed.code, failed.message, "\(data)")
                                 }
                                 
                                 if processed==false {
-                                    failedClosure(codeValue, msg ?? "", "\(data)", timestamp)
+                                    failedClosure(codeValue, msg ?? "", "\(data)")
                                 }
                             }else {
-                                failedClosure(codeValue, msg ?? "", "\(data)", timestamp)
+                                failedClosure(codeValue, msg ?? "", "\(data)")
                             }
                             return
                         }
                     }
-                    result(code: codeValue, msg: msg ?? "", data: data as Any, timestamp: timestamp) { res in
+                    result(code: codeValue, msg: msg ?? "", data: data as Any) { res in
                         if Self.openLog {
                             if res {
                                 print("✅-------- WisdomNetwork - Response - Success --------✅")
@@ -188,7 +188,7 @@ struct WisdomNetworkCore {
                 print("url init failed: "+"url error: "+request.url)
                 print("-----------------------------------------------------")
             }
-            failedClosure(-1, "url init failed", "url error: "+request.url, 0)
+            failedClosure(-1, "url init failed", "url error: "+request.url)
         }
         return nil
     }
