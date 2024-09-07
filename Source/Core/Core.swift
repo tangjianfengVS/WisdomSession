@@ -26,7 +26,7 @@ struct WisdomSessionCore {
     /* network requestable */
     static func request(clientable: WisdomSessionable,
                         responseable: WisdomSessionResponseable.Type?,
-                        succeedClosure: @escaping WisdomSessionSucceedClosure,
+                        succedClosure: @escaping WisdomSessionSuccedClosure,
                         failedClosure: @escaping WisdomSessionFailedClosure)->DataRequest? {
         let request = WisdomSessionRequest(baseUrl: clientable.baseURL,
                                            path: clientable.path,
@@ -36,37 +36,45 @@ struct WisdomSessionCore {
                                            debugData: clientable.debugData,
                                            responseable: responseable,
                                            desc: clientable.description)
-        return Self.request(request: request, succeedClosure: succeedClosure, failedClosure: failedClosure)
+        return Self.request(request: request, succedClosure: succedClosure, failedClosure: failedClosure)
     }
 
     
     /* network request */
     static func request(request: WisdomSessionRequest,
-                        succeedClosure: @escaping WisdomSessionSucceedClosure,
+                        succedClosure: @escaping WisdomSessionSuccedClosure,
                         failedClosure: @escaping WisdomSessionFailedClosure)->DataRequest? {
         
-        func result(code: NSInteger, msg: String, data: Any, resultClosure: ((Bool)->())?=nil){
+        func result(code: NSInteger, msg: String, timestamp: NSInteger, data: Any, resultClosure: ((Bool)->())?=nil){
             if request.responseable != nil || Self.responseable != nil {
                 var processed = false
                 // request -> responseable
-                if let able = request.responseable, let failed = able.response(code: code, message: msg, responseData: data) {
+                if let able = request.responseable, let failed = able.response(code: code,
+                                                                               message: msg,
+                                                                               timestamp: timestamp,
+                                                                               responseData: data) {
                     processed = true
                     resultClosure?(false)
-                    failedClosure(failed.code, failed.message, "\(data)")
+                    failedClosure(failed.code, failed.message, failed.timestamp, "\(data)")
                 }
+                
                 // 全局 -> responseable
-                if let able = Self.responseable, let failed = able.response(code: code, message: msg, responseData: data) {
+                if let able = Self.responseable, let failed = able.response(code: code,
+                                                                            message: msg,
+                                                                            timestamp: timestamp,
+                                                                            responseData: data) {
                     processed = true
                     resultClosure?(false)
-                    failedClosure(failed.code, failed.message, "\(data)")
+                    failedClosure(failed.code, failed.message, failed.timestamp, "\(data)")
                 }
+                
                 if processed==false {
                     resultClosure?(true)
-                    succeedClosure(code, msg, data)
+                    succedClosure(code, msg, timestamp, data)
                 }
             }else {
                 resultClosure?(true)
-                succeedClosure(code, msg, data)
+                succedClosure(code, msg, timestamp, data)
             }
         }
         
@@ -81,33 +89,42 @@ struct WisdomSessionCore {
             Alamofire.AF.sessionConfiguration.headers = .default
             
             if Self.openLog {
-                print("❤️❤️------- WisdomNetwork - Request - Start -------❤️❤️")
+                print("❤️❤️------- WisdomSession - Request - Start -------❤️❤️")
                 print(request)
                 print("-------------------------------------------------------")
             }
+            
             #if DEBUG
             if let debugData = request.debugData {
-                DispatchQueue.main.asyncAfter(deadline: DispatchTime.now()+debugData.asyncTime, execute: {
+                DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + debugData.asyncTime, execute: {
                     if Self.openLog {
-                        print("✅-------- WisdomNetwork - DebugData - Success --------✅")
+                        print("✅-------- WisdomSession - DebugData - Success --------✅")
                         print(debugData)
                         print("---------------------------------------------------------")
                     }
+                    
                     if debugData.code < 0 {
-                        failedClosure(debugData.code, debugData.message, "\(debugData.responseData)")
+                        failedClosure(debugData.code,
+                                      debugData.message,
+                                      debugData.timestamp,
+                                      "\(debugData.responseData)")
                     }else {
-                        result(code: debugData.code, msg: debugData.message, data: debugData.responseData)
+                        result(code     : debugData.code,
+                               msg      : debugData.message,
+                               timestamp: debugData.timestamp,
+                               data     : debugData.responseData)
                     }
                 })
                 return nil
             }
             #endif
+            
             let dataRequest = Alamofire.AF.request(url, method: method, parameters: request.parameters, encoding: encoding, headers: headers, interceptor: nil).responseData { dataResponse in
                 
                 switch dataResponse.result {
                 case .failure(let afError):
                     if Self.openLog {
-                        print("❌-------- WisdomNetwork - Response - Error --------❌")
+                        print("❌-------- WisdomSession - Response - Error --------❌")
                         print(afError)
                         print("------------------------------------------------------")
                     }
@@ -119,17 +136,18 @@ struct WisdomSessionCore {
                     }else {
                         error = "网络请求失败，请稍后重试"
                     }
-                    failedClosure(afError.responseCode ?? -1, error, "\(afError)")
+                    failedClosure(afError.responseCode ?? -1, error, 0, "\(afError)")
+                    
                 case .success(let data):
                     let dictResponse = encoderDict(data: data)
-                    let data = dictResponse["data"] ?? ""
-                    var msg = dictResponse["message"] as? String
+                    let data = dictResponse[#keyPath(WisdomSession.data)] ?? ""
+                    var msg = dictResponse[#keyPath(WisdomSession.message)] as? String
                     if msg == nil {
-                        msg = (dictResponse["msg"] as? String) ?? ""
+                        msg = (dictResponse[#keyPath(WisdomSession.msg)] as? String) ?? ""
                     }
                     
-                    let code = dictResponse["code"]
-                    let timestamp = dictResponse["timestamp"] as? NSInteger ?? 0
+                    let code = dictResponse[#keyPath(WisdomSession.code)]
+                    let timestamp = dictResponse[#keyPath(WisdomSession.timestamp)] as? NSInteger ?? 0
                     
                     var codeValue: NSInteger = 0
                     if let code_double = code as? Double {
@@ -137,43 +155,51 @@ struct WisdomSessionCore {
                     }else if let code_integer = code as? NSInteger {
                        codeValue = code_integer
                     }
+                    
                     for error in WisdomSessionErrorStauts.allCases {
                         if error.rawValue == codeValue {
                             if Self.openLog {
-                                print("❌-------- WisdomNetwork - Response - Error --------❌")
+                                print("❌-------- WisdomSession - Response - Error --------❌")
                                 print(dictResponse)
                                 print("------------------------------------------------------")
                             }
                             if request.responseable != nil || Self.responseable != nil {
                                 var processed = false
                                 // request -> responseable
-                                if let able = request.responseable, let failed = able.response(code: codeValue, message: msg ?? "", responseData: data) {
+                                if let able = request.responseable, let failed = able.response(code: codeValue,
+                                                                                               message: msg ?? "",
+                                                                                               timestamp: timestamp,
+                                                                                               responseData: data) {
                                     processed = true
-                                    failedClosure(failed.code, failed.message, "\(data)")
+                                    failedClosure(failed.code, failed.message, timestamp, "\(data)")
                                 }
                                 // 全局 -> responseable
-                                if let able = Self.responseable, let failed = able.response(code: codeValue, message: msg ?? "", responseData: data) {
+                                if let able = Self.responseable, let failed = able.response(code: codeValue,
+                                                                                            message: msg ?? "",
+                                                                                            timestamp: timestamp,
+                                                                                            responseData: data) {
                                     processed = true
-                                    failedClosure(failed.code, failed.message, "\(data)")
+                                    failedClosure(failed.code, failed.message, timestamp, "\(data)")
                                 }
                                 
                                 if processed==false {
-                                    failedClosure(codeValue, msg ?? "", "\(data)")
+                                    failedClosure(codeValue, msg ?? "", timestamp, "\(data)")
                                 }
                             }else {
-                                failedClosure(codeValue, msg ?? "", "\(data)")
+                                failedClosure(codeValue, msg ?? "", timestamp, "\(data)")
                             }
                             return
                         }
                     }
-                    result(code: codeValue, msg: msg ?? "", data: data as Any) { res in
+                    
+                    result(code: codeValue, msg: msg ?? "", timestamp: timestamp, data: data as Any) { res in
                         if Self.openLog {
                             if res {
-                                print("✅-------- WisdomNetwork - Response - Success --------✅")
+                                print("✅-------- WisdomSession - Response - Success --------✅")
                                 print(dictResponse)
                                 print("--------------------------------------------------------")
                             }else {
-                                print("❌-------- WisdomNetwork - Response - Error --------❌")
+                                print("❌-------- WisdomSession - Response - Error --------❌")
                                 print(dictResponse)
                                 print("------------------------------------------------------")
                             }
@@ -184,11 +210,11 @@ struct WisdomSessionCore {
             return dataRequest
         }else {
             if Self.openLog {
-                print("❌-------- WisdomNetwork - Request - Error --------❌")
+                print("❌-------- WisdomSession - Request - Error --------❌")
                 print("url init failed: "+"url error: "+request.url)
                 print("-----------------------------------------------------")
             }
-            failedClosure(-1, "url init failed", "url error: "+request.url)
+            failedClosure(-1, "url init failed", 0, "url error: "+request.url)
         }
         return nil
     }

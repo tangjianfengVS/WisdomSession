@@ -8,11 +8,38 @@
 import Foundation
 
 
+/* 1.code: 响应码  2.message: 响应信息  3.timestamp: 时间戳  4.responseData: 响应数据 */
+public typealias WisdomSessionSuccedClosure = (_ code: NSInteger,
+                                               _ message: String,
+                                               _ timestamp: NSInteger,
+                                               _ responseData: Any)->()
+
+/* 1.code: 错误码  2.message: 错误信息  3.timestamp: 时间戳  4.rawResponseString: 原始信息 */
+public typealias WisdomSessionFailedClosure = (_ code: NSInteger,
+                                               _ message: String,
+                                               _ timestamp: NSInteger,
+                                               _ rawResponseString: String)->()
+
+/* 1.code: 错误码  2.message: 错误信息  3.timestamp: 时间戳 */
+public typealias WisdomSessionFailed = (code: NSInteger, message: String, timestamp: NSInteger)
+
+
+/* 1.code: 错误码  2.message: 错误信息  3.timestamp: 时间戳 4.responseData: 响应数据 5.asyncTime：延迟时间 */
+public typealias WisdomSessionDebugData = (code: NSInteger,
+                                           message: String,
+                                           timestamp: NSInteger,
+                                           responseData: Any,
+                                           asyncTime: TimeInterval)
+
+
 /* 响应协议 */
 public protocol WisdomSessionResponseable {
     
     // 响应 Error 统一处理
-    static func response(code: NSInteger, message: String, responseData: Any)->WisdomSessionFailed?
+    static func response(code: NSInteger,
+                         message: String,
+                         timestamp: NSInteger,
+                         responseData: Any)->WisdomSessionFailed?
 }
 
 
@@ -49,9 +76,10 @@ public protocol WisdomSessionable {
     // MARK: Debug 环境下模拟数据。如果请求实现此属性 Debug 环境不在走网络数据，Release 环境自动忽略。
     // - code         : NSInteger
     // - message      : String
+    // - timestamp    : 时间戳
     // - responseData : Any
     // - asyncTime    : TimeInterval 异步延迟
-    var debugData: (code: NSInteger, message: String, responseData: Any, asyncTime: TimeInterval)? { get }
+    var debugData: WisdomSessionDebugData? { get }
 }
 
 

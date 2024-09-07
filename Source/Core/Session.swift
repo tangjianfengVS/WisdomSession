@@ -23,17 +23,19 @@ public enum WisdomSessionStatus {
     case cellular       // 蜂窝网络
 }
 
-/* 1.code: 响应码  2.message: 响应信息  3.responseData: 响应数据 */
-public typealias WisdomSessionSucceedClosure = (_ code: NSInteger, _ message: String, _ responseData: Any)->()
-
-/* 1.code: 错误码  2.message: 错误信息  3.rawResponseString: 原始信息 */
-public typealias WisdomSessionFailedClosure = (_ code: NSInteger, _ message: String, _ rawResponseString: String)->()
-
-/* 1.code: 错误码  2.message: 错误信息 */
-public typealias WisdomSessionFailed = (code: NSInteger, message: String)
-
 
 public class WisdomSession: WisdomSessionInfoable {
+    
+    @objc var data: String?
+    
+    @objc var message: String?
+    
+    @objc var msg: String?
+    
+    @objc var code: String?
+    
+    @objc var timestamp: String?
+    
     
     // MARK: 查看全局 baseURL
     /// - Parameters:
@@ -69,11 +71,11 @@ extension WisdomSession {
     @discardableResult
     public static func request(clientable: WisdomSessionable,
                                responseable: WisdomSessionResponseable.Type?=nil,
-                               succeedClosure: @escaping WisdomSessionSucceedClosure,
+                               succedClosure: @escaping WisdomSessionSuccedClosure,
                                failedClosure: @escaping WisdomSessionFailedClosure)->DataRequest? {
         return WisdomSessionCore.request(clientable: clientable,
                                          responseable: responseable,
-                                         succeedClosure: succeedClosure,
+                                         succedClosure: succedClosure,
                                          failedClosure: failedClosure)
     }
     
@@ -85,10 +87,10 @@ extension WisdomSession {
     /// - Returns: DataRequest?
     @discardableResult
     public static func request(request: WisdomSessionRequest,
-                               succeedClosure: @escaping WisdomSessionSucceedClosure,
+                               succedClosure: @escaping WisdomSessionSuccedClosure,
                                failedClosure: @escaping WisdomSessionFailedClosure)->DataRequest? {
         return WisdomSessionCore.request(request: request,
-                                         succeedClosure: succeedClosure,
+                                         succedClosure: succedClosure,
                                          failedClosure: failedClosure)
     }
 }
