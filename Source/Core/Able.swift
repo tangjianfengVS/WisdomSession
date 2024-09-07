@@ -97,7 +97,7 @@ public extension WisdomSessionable {
     
     //var responseable: CNetworkResponseable.Type? { nil }
     
-    var debugData: (code: NSInteger, message: String, responseData: Any, asyncTime: TimeInterval)? { nil }
+    var debugData: WisdomSessionDebugData? { nil }
 }
 
 
