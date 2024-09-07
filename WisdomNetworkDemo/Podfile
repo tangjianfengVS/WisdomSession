@@ -10,5 +10,5 @@ target 'WisdomNetworkDemo' do
   # Pods for WisdomNetworkDemo
   pod 'Alamofire', '5.8.0'
 
-  pod 'WisdomNetwork', :path=>"/Users/qmlt/Desktop/jianfeng/github/WisdomNetwork/"
+  pod 'WisdomSession', :path=>"../"
 end

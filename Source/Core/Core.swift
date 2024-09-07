@@ -1,6 +1,6 @@
 //
 //  Core.swift
-//  WisdomNetwork
+//  WisdomSession
 //
 //  Created by qmlt on 2023/11/23.
 //
@@ -9,13 +9,13 @@ import Foundation
 import Alamofire
 
 
-struct WisdomNetworkCore {
+struct WisdomSessionCore {
     
     /* network domain */
     private(set) static var baseURL: String?
     
     /* network response result */
-    private(set) static var responseable: WisdomNetworkResponseable.Type?
+    private(set) static var responseable: WisdomSessionResponseable.Type?
     
     /* network timeout interval for request */
     private(set) static var timeoutIntervalForRequest: TimeInterval = 45
@@ -24,11 +24,11 @@ struct WisdomNetworkCore {
 
     
     /* network requestable */
-    static func request(clientable: WisdomNetworkable,
-                        responseable: WisdomNetworkResponseable.Type?,
-                        succeedClosure: @escaping WisdomNetworkSucceedClosure,
-                        failedClosure: @escaping WisdomNetworkFailedClosure)->DataRequest? {
-        let request = WisdomNetworkRequest(baseUrl: clientable.baseURL,
+    static func request(clientable: WisdomSessionable,
+                        responseable: WisdomSessionResponseable.Type?,
+                        succeedClosure: @escaping WisdomSessionSucceedClosure,
+                        failedClosure: @escaping WisdomSessionFailedClosure)->DataRequest? {
+        let request = WisdomSessionRequest(baseUrl: clientable.baseURL,
                                            path: clientable.path,
                                            method: clientable.method,
                                            parameters: clientable.parameters,
@@ -41,9 +41,9 @@ struct WisdomNetworkCore {
 
     
     /* network request */
-    static func request(request: WisdomNetworkRequest,
-                        succeedClosure: @escaping WisdomNetworkSucceedClosure,
-                        failedClosure: @escaping WisdomNetworkFailedClosure)->DataRequest? {
+    static func request(request: WisdomSessionRequest,
+                        succeedClosure: @escaping WisdomSessionSucceedClosure,
+                        failedClosure: @escaping WisdomSessionFailedClosure)->DataRequest? {
         
         func result(code: NSInteger, msg: String, data: Any, resultClosure: ((Bool)->())?=nil){
             if request.responseable != nil || Self.responseable != nil {
@@ -137,7 +137,7 @@ struct WisdomNetworkCore {
                     }else if let code_integer = code as? NSInteger {
                        codeValue = code_integer
                     }
-                    for error in WisdomNetworkErrorStauts.allCases {
+                    for error in WisdomSessionErrorStauts.allCases {
                         if error.rawValue == codeValue {
                             if Self.openLog {
                                 print("❌-------- WisdomNetwork - Response - Error --------❌")
@@ -193,7 +193,7 @@ struct WisdomNetworkCore {
         return nil
     }
     
-    static func getClientState()->WisdomNetworkStatus {
+    static func getClientState()-> WisdomSessionStatus {
         switch NetworkReachabilityManager.default?.status{
         case .unknown:      return .unknown
         case .notReachable: return .notReachable // 无网络
@@ -208,27 +208,27 @@ struct WisdomNetworkCore {
 }
 
 
-extension WisdomNetworkCore: WisdomNetworkSetable {
+extension WisdomSessionCore: WisdomSessionSetable {
     
-    static func setNetwork(baseURL: String) {
+    static func setSession(baseURL: String) {
         Self.baseURL = baseURL
     }
     
-    static func setNetwork(responseable: WisdomNetworkResponseable.Type) {
+    static func setSession(responseable: WisdomSessionResponseable.Type) {
         Self.responseable = responseable
     }
     
-    static func setNetwork(requestTimeoutInterval: TimeInterval)  {
+    static func setSession(requestTimeoutInterval: TimeInterval)  {
         Self.timeoutIntervalForRequest = requestTimeoutInterval
     }
     
-    static func setNetwork(openLog: Bool) {
+    static func setSession(openLog: Bool) {
         Self.openLog = openLog
     }
 }
 
 
-extension WisdomNetworkCore: WisdomNetworkEncoderable {
+extension WisdomSessionCore: WisdomSessionEncoderable {
     
     static func encoderJson(dict: [String : Any]) -> String {
         let data = try? JSONSerialization.data(withJSONObject: dict, options: [])

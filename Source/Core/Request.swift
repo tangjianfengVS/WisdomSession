@@ -1,6 +1,6 @@
 //
-//  WisdomNetwork+Request.swift
-//  WisdomNetwork
+//  WisdomSession+Request.swift
+//  WisdomSession
 //
 //  Created by qmlt on 2023/11/23.
 //
@@ -8,7 +8,7 @@
 import Foundation
 
 
-public struct WisdomNetworkRequest {
+public struct WisdomSessionRequest {
 
     public let url: String // 域名 + path
     
@@ -16,7 +16,7 @@ public struct WisdomNetworkRequest {
     
     public let urlPath: String
     
-    public let method: WisdomNetworkMethod
+    public let method: WisdomSessionMethod
     
     public let parameters: [String:Any]
     
@@ -24,7 +24,7 @@ public struct WisdomNetworkRequest {
     
     public let description: String
     
-    public let responseable: WisdomNetworkResponseable.Type?
+    public let responseable: WisdomSessionResponseable.Type?
     
     // MARK: Debug 环境下模拟数据。如果请求实现此属性 Debug 环境不在走网络数据，Release 环境自动忽略。
     // - code         : NSInteger
@@ -38,13 +38,13 @@ public struct WisdomNetworkRequest {
     
     /* url path 路径 初始化 */
     public init(path: String,
-                method: WisdomNetworkMethod,
+                method: WisdomSessionMethod,
                 parameters: [String:Any],
                 headers: [String:String]?=nil,
                 debugData: (code: NSInteger, message: String, responseData: Any, asyncTime: TimeInterval)?=nil,
-                responseable: WisdomNetworkResponseable.Type?=nil,
+                responseable: WisdomSessionResponseable.Type?=nil,
                 desc: String="") {
-        if let baseURL = WisdomNetworkCore.baseURL, baseURL.count > 0{
+        if let baseURL = WisdomSessionCore.baseURL, baseURL.count > 0{
             url = Self.getUrl(baseUrl: baseURL, urlPath: path)
             self.baseUrl = baseURL
         }else {
@@ -63,11 +63,11 @@ public struct WisdomNetworkRequest {
     /* baseUrl + url path 路径 初始化 */
     public init(baseUrl: String,
                 path: String,
-                method: WisdomNetworkMethod,
+                method: WisdomSessionMethod,
                 parameters: [String:Any],
                 headers: [String:String]?=nil,
                 debugData: (code: NSInteger, message: String, responseData: Any, asyncTime: TimeInterval)?=nil,
-                responseable: WisdomNetworkResponseable.Type?=nil,
+                responseable: WisdomSessionResponseable.Type?=nil,
                 desc: String="") {
         url = Self.getUrl(baseUrl: baseUrl, urlPath: path)
         

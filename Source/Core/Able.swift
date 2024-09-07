@@ -1,6 +1,6 @@
 //
 //  Able.swift
-//  WisdomNetwork
+//  WisdomSession
 //
 //  Created by qmlt on 2023/11/23.
 //
@@ -9,15 +9,15 @@ import Foundation
 
 
 /* 响应协议 */
-public protocol WisdomNetworkResponseable {
+public protocol WisdomSessionResponseable {
     
     // 响应 Error 统一处理
-    static func response(code: NSInteger, message: String, responseData: Any)->WisdomNetworkFailed?
+    static func response(code: NSInteger, message: String, responseData: Any)->WisdomSessionFailed?
 }
 
 
 /* 入参数 协议, 用于 '枚举' 绑定协议实现 */
-public protocol WisdomNetworkable {
+public protocol WisdomSessionable {
 
     // The target's base `String`.
     var baseURL: String { get }
@@ -26,7 +26,7 @@ public protocol WisdomNetworkable {
     var path: String { get }
 
     // The HTTP method used in the request.
-    var method: WisdomNetworkMethod { get }
+    var method: WisdomSessionMethod { get }
 
     // Provides stub data for use in testing. Default is `Data()`.
     //var sampleData: Data { get }
@@ -55,7 +55,7 @@ public protocol WisdomNetworkable {
 }
 
 
-public extension WisdomNetworkable {
+public extension WisdomSessionable {
 
     // The type of validation to perform on the request. Default is `.none`.
     //var validationType: ValidationType { .none }
@@ -73,29 +73,29 @@ public extension WisdomNetworkable {
 }
 
 
-protocol WisdomNetworkSetable {
+protocol WisdomSessionSetable {
 
-    static func setNetwork(baseURL: String)
+    static func setSession(baseURL: String)
 
-    static func setNetwork(responseable: WisdomNetworkResponseable.Type)
+    static func setSession(responseable: WisdomSessionResponseable.Type)
     
-    static func setNetwork(requestTimeoutInterval: TimeInterval)
+    static func setSession(requestTimeoutInterval: TimeInterval)
     
-    static func setNetwork(openLog: Bool)
+    static func setSession(openLog: Bool)
 }
 
 
-protocol WisdomNetworkInfoable where Self: WisdomNetwork {
+protocol WisdomSessionInfoable where Self: WisdomSession {
 
     static var baseURL: String? { get }
 
-    static var responseable: WisdomNetworkResponseable.Type? { get }
+    static var responseable: WisdomSessionResponseable.Type? { get }
     
-    static var currentNetworkState: WisdomNetworkStatus { get }
+    static var currentSessionState: WisdomSessionStatus { get }
 }
 
 
-protocol WisdomNetworkEncoderable {
+protocol WisdomSessionEncoderable {
 
     static func encoderJson(dict: [String: Any])->String
 
