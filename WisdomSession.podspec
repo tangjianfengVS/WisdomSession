@@ -10,9 +10,11 @@ Pod::Spec.new do |s|
   s.description   = 'Based on 【Alamofire】 library, encapsulated network framework library(基于 Alamofire 库，封装的网络框架库).'
 
   s.platform      = :ios, '12.0'
-  s.swift_version = ['5.5', '5.6', '5.7', '5.8.1']
+  s.platform      = :osx, '10.15'
+  s.swift_version = ['5.6', '5.7', '5.8.1']
 
   s.ios.deployment_target = '12.0'
+  s.osx.deployment_target = '10.15'
   # s.osx.deployment_target = ''
   # s.watchos.deployment_target = ''
   # s.tvos.deployment_target = ''
