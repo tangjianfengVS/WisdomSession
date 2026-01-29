@@ -36,6 +36,9 @@ public protocol WisdomSessionable {
     // - responseData : Any
     // - asyncTime    : TimeInterval 异步延迟
     var responseDebugData: WisdomSessionDebugData? { get }
+    
+    // MARK: The Current Session Cancel. (停止当前网络请求)
+    func cancelSession()
 }
 
 
@@ -50,8 +53,6 @@ public protocol WisdomSessionApiable: WisdomSessionable {
     // MARK: Session Start. (开启网络请求)
     func request(succedClosure: @escaping WisdomSessionSuccedClosure, failedClosure: @escaping WisdomSessionFailedClosure)
     
-    // MARK: The Current Session Cancel. (停止当前网络请求)
-    func cancelSession()
 }
 
 
@@ -87,8 +88,6 @@ public protocol WisdomSessionUploadApiable: WisdomSessionable {
     // MARK: Session Start. (开启网络请求)
     func requestUpload(succedClosure: @escaping WisdomSessionSuccedClosure, failedClosure: @escaping WisdomSessionFailedClosure)
     
-    // MARK: The Current Session Cancel. (停止当前网络请求)
-    func cancelSession()
 }
 
 
