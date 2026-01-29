@@ -20,6 +20,14 @@ public class WisdomSession: WisdomSessionInfoable {
     @objc var code: String?
 
     @objc var timestamp: String?
+    
+    @objc var file: String?
+    
+    @objc var image: String?
+    
+    @objc var voice: String?
+    
+    @objc var yyyyMMddHHmmss: String?
 
 
     // MARK: 查看全局 baseURL
@@ -48,37 +56,6 @@ public class WisdomSession: WisdomSessionInfoable {
     ///   - headersable: client headersable result
     public static var headersable: WisdomSessionHeadersable.Type? {
         get { WisdomSessionCore.headersable }
-    }
-}
-
-
-extension WisdomSession {
-
-    // MARK: 通过配置 CNetworkable 参数，网络请求
-    /// - Parameters:
-    ///   - clientable         : 请求参数配置
-    ///   - succeedClosure: 成功结果回调
-    ///   - failedClosure  : 失败结果回调
-    /// - Returns: DataRequest?
-    @discardableResult
-    public static func request(clientable: WisdomSessionApiable,
-                               succedClosure: @escaping WisdomSessionSuccedClosure,
-                               failedClosure: @escaping WisdomSessionFailedClosure)->DataRequest? {
-        return WisdomSessionCore.request(clientable: clientable,
-                                         succedClosure: succedClosure,
-                                         failedClosure: failedClosure)
-    }
-
-    
-    // MARK: 通过配置 CNetworkRequest 参数，网络请求
-    /// - Parameters:
-    ///   - request               : 请求参数配置
-    ///   - succeedClosure: 成功结果回调
-    ///   - failedClosure  : 失败结果回调
-    public static func request(request: WisdomSessionRequest,
-                               succedClosure: @escaping WisdomSessionSuccedClosure,
-                               failedClosure: @escaping WisdomSessionFailedClosure) {
-        _ = WisdomSessionCore.request(request: request, succedClosure: succedClosure, failedClosure: failedClosure)
     }
 }
 
@@ -118,6 +95,68 @@ extension WisdomSession: WisdomSessionGlobalSetable {
     ///   - headersable: Client set headersable
     public static func setSession(headersable: WisdomSessionHeadersable.Type) {
         WisdomSessionCore.setSession(headersable: headersable)
+    }
+}
+
+
+extension WisdomSession {
+
+    // MARK: 通过配置 CNetworkable 参数，网络请求
+    /// - Parameters:
+    ///   - clientable         : 请求参数配置
+    ///   - succeedClosure: 成功结果回调
+    ///   - failedClosure  : 失败结果回调
+    /// - Returns: DataRequest?
+    @discardableResult
+    public static func request(clientable: WisdomSessionApiable,
+                               succedClosure: @escaping WisdomSessionSuccedClosure,
+                               failedClosure: @escaping WisdomSessionFailedClosure)->DataRequest? {
+        return WisdomSessionCore.request(clientable: clientable,
+                                         succedClosure: succedClosure,
+                                         failedClosure: failedClosure)
+    }
+
+    
+    // MARK: 通过配置 CNetworkRequest 参数，网络请求
+    /// - Parameters:
+    ///   - request               : 请求参数配置
+    ///   - succeedClosure: 成功结果回调
+    ///   - failedClosure  : 失败结果回调
+    public static func request(request: WisdomSessionRequest,
+                               succedClosure: @escaping WisdomSessionSuccedClosure,
+                               failedClosure: @escaping WisdomSessionFailedClosure) {
+        _ = WisdomSessionCore.request(request: request, succedClosure: succedClosure, failedClosure: failedClosure)
+    }
+}
+
+
+extension WisdomSession {
+
+    // MARK: 通过配置 CNetworkable 参数，文件上传
+    /// - Parameters:
+    ///   - clientable         : 请求参数配置
+    ///   - succeedClosure: 成功结果回调
+    ///   - failedClosure  : 失败结果回调
+    /// - Returns: DataRequest?
+    @discardableResult
+    public static func requestUpload(clientable: WisdomSessionUploadApiable,
+                                     succedClosure: @escaping WisdomSessionSuccedClosure,
+                                     failedClosure: @escaping WisdomSessionFailedClosure)->UploadRequest? {
+        return WisdomSessionCore.requestUpload(clientable: clientable,
+                                               succedClosure: succedClosure,
+                                               failedClosure: failedClosure)
+    }
+
+    
+    // MARK: 通过配置 CNetworkRequest 参数，文件上传
+    /// - Parameters:
+    ///   - request               : 请求参数配置
+    ///   - succeedClosure: 成功结果回调
+    ///   - failedClosure  : 失败结果回调
+    public static func requestUpload(request: WisdomSessionUploadRequest,
+                                     succedClosure: @escaping WisdomSessionSuccedClosure,
+                                     failedClosure: @escaping WisdomSessionFailedClosure) {
+        _ = WisdomSessionCore.requestUpload(request: request, succedClosure: succedClosure, failedClosure: failedClosure)
     }
 }
 

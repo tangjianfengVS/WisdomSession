@@ -35,7 +35,7 @@ struct WisdomSessionCore {
                                            parameters: clientable.parameters,
                                            headers: clientable.headers ?? [:],
                                            responseDebugData: clientable.responseDebugData,
-                                           description: clientable.apiDescription)
+                                           description: clientable.description)
         return Self.request(request: request, succedClosure: succedClosure, failedClosure: failedClosure)
     }
 
@@ -44,20 +44,6 @@ struct WisdomSessionCore {
     static func request(request: WisdomSessionRequest,
                         succedClosure: @escaping WisdomSessionSuccedClosure,
                         failedClosure: @escaping WisdomSessionFailedClosure)->DataRequest? {
-        
-        func result(code: NSInteger, msg: String, data: Any, resultClosure: ((Bool)->())?=nil) {
-            // 全局 -> responseable
-            if let responseable = Self.responseable, let failed = responseable.response(code: code,
-                                                                               message: msg,
-                                                                               responseData: data) {
-                resultClosure?(false)
-                failedClosure(failed.code, failed.message, "\(data)")
-            }else {
-                resultClosure?(true)
-                succedClosure(code, msg, data)
-            }
-        }
-        
         var url = URL(string: request.url)
         if url == nil && !(request.baseUrl ?? "").isEmpty {
             url = URL(string: WisdomSessionRequest.getUrl(baseUrl: Self.baseURL ?? "", urlPath: request.urlPath))
@@ -84,7 +70,7 @@ struct WisdomSessionCore {
             
             let openLog = Self.openLog
             if openLog {
-                print("[WisdomSession]: ❤️ Request - Start ❤️")
+                print("[WisdomSession]: 🔥 Request - Start 🔥")
                 print("URL = \(url.absoluteString)")
                 print(request)
                 print("---------------------------------------")
@@ -103,100 +89,21 @@ struct WisdomSessionCore {
                     if debugData.code <= 0 {
                         failedClosure(debugData.code, debugData.message, "\(debugData.responseData)")
                     }else {
-                        result(code : debugData.code, msg : debugData.message, data : debugData.responseData)
+                        Self.result(code: debugData.code,
+                                    msg: debugData.message,
+                                    data: debugData.responseData,
+                                    succedClosure: succedClosure,
+                                    failedClosure: failedClosure)
                     }
                 })
+                request.setDataRequest(dataRequest: nil)
                 return nil
             }
             #endif
             
             let dataRequest = Alamofire.AF.request(url, method: method, parameters: request.parameters, encoding: encoding, headers: headers, interceptor: nil).responseData { dataResponse in
-                
-                switch dataResponse.result {
-                case .failure(let afError):
-                    var error = afError.errorDescription ?? ""
-                    if "\(afError)".contains("Code=-1020") || "\(afError)".contains("Code=-1009") {
-                        error = "网络连接错误，请检查网络"
-                    }else if "\(afError)".contains("Code=-1001") {
-                        error = "网络连接超时，请检查网络"
-                    }else {
-                        error = "网络请求失败，请稍后重试"
-                    }
-                    
-                    if openLog {
-                        print("[WisdomSession]: ❌ Response - Error ❌")
-                        print("URL = \(url.absoluteString)")
-                        print("Error = \(error)")
-                        print(afError)
-                        print("----------------------------------------")
-                    }
-                    
-                    failedClosure(afError.responseCode ?? -1, error, "\(afError)")
-                    
-                case .success(let data):
-                    let dictResponse = encoderDict(data: data)
-                    let data = dictResponse[#keyPath(WisdomSession.data)] ?? ""
-                    var msg = dictResponse[#keyPath(WisdomSession.message)] as? String
-                    if msg == nil {
-                        msg = (dictResponse[#keyPath(WisdomSession.msg)] as? String) ?? ""
-                    }
-                    
-                    let code = dictResponse[#keyPath(WisdomSession.code)]
-                    //let timestamp = dictResponse[#keyPath(WisdomSession.timestamp)] as? NSInteger ?? 0
-                    
-                    var codeValue: NSInteger = 0
-                    if let code_double = code as? Double {
-                       codeValue = NSInteger(code_double)
-                    }else if let code_integer = code as? NSInteger {
-                       codeValue = code_integer
-                    }
-                    
-                    for error in WisdomSessionErrorStauts.allCases {
-                        if error.rawValue == codeValue {
-                            
-                            if openLog {
-                                print("[WisdomSession]: ❌ Response - Error ❌")
-                                print("URL = \(url.absoluteString)")
-                                print(dictResponse)
-                                print("----------------------------------------")
-                            }
-                            
-                            if Self.responseable != nil {
-                                var processed = false
-                                // 全局 -> responseable
-                                if let able = Self.responseable, let failed = able.response(code: codeValue,
-                                                                                            message: msg ?? "",
-                                                                                            responseData: data) {
-                                    processed = true
-                                    failedClosure(failed.code, failed.message, "\(data)")
-                                }
 
-                                if processed == false {
-                                    failedClosure(codeValue, msg ?? "", "\(data)")
-                                }
-                            }else {
-                                failedClosure(codeValue, msg ?? "", "\(data)")
-                            }
-                            return
-                        }
-                    }
-                    
-                    result(code: codeValue, msg: msg ?? "", data: data as Any) { res in
-                        if openLog {
-                            if res {
-                                print("[WisdomSession]: ✅ Response - Success ✅")
-                                print("URL = \(url.absoluteString)")
-                                print(dictResponse)
-                                print("------------------------------------------")
-                            }else {
-                                print("[WisdomSession]: ❌ Response - Error ❌")
-                                print("URL = \(url.absoluteString)")
-                                print(dictResponse)
-                                print("----------------------------------------")
-                            }
-                        }
-                    }
-                }
+                Self.setResponseResult(url: url, openLog: openLog, dataResponse: dataResponse, succedClosure: succedClosure, failedClosure: failedClosure)
             }
             
             request.setDataRequest(dataRequest: dataRequest)
@@ -212,6 +119,115 @@ struct WisdomSessionCore {
             failedClosure(-1, "无效链接", "Request URL = \(request.url)" + "/Core Base URL = \(Self.baseURL ?? "")")
             request.setDataRequest(dataRequest: nil)
             return nil
+        }
+    }
+    
+    
+    static func setResponseResult(url: URL,
+                                  openLog: Bool,
+                                  dataResponse: AFDataResponse<Data>,
+                                  succedClosure: WisdomSessionSuccedClosure,
+                                  failedClosure: WisdomSessionFailedClosure) {
+        switch dataResponse.result {
+        case .failure(let afError):
+            var error = afError.errorDescription ?? "网络请求失败，请稍后重试"
+            if "\(afError)".contains("Code=-1020") || "\(afError)".contains("Code=-1009") {
+                error = "网络连接错误，请检查网络"
+            }else if "\(afError)".contains("Code=-1001") {
+                error = "网络连接超时，请检查网络"
+            }
+            
+            if openLog {
+                print("[WisdomSession]: ❌ Response - Error ❌")
+                print("URL = \(url.absoluteString)")
+                print("Error = \(error)")
+                print(afError)
+                print("----------------------------------------")
+            }
+            
+            failedClosure(afError.responseCode ?? -1, error, "\(afError)")
+            
+        case .success(let data):
+            let dictResponse = Self.encoderDict(data: data)
+            let data = dictResponse[#keyPath(WisdomSession.data)] ?? ""
+            var msg = dictResponse[#keyPath(WisdomSession.message)] as? String
+            if msg == nil {
+                msg = (dictResponse[#keyPath(WisdomSession.msg)] as? String) ?? ""
+            }
+            
+            let code = dictResponse[#keyPath(WisdomSession.code)]
+            
+            var codeValue: NSInteger = 0
+            if let code_double = code as? Double {
+               codeValue = NSInteger(code_double)
+            }else if let code_integer = code as? NSInteger {
+               codeValue = code_integer
+            }
+            
+            for error in WisdomSessionErrorStauts.allCases {
+                if error.rawValue == codeValue {
+                    
+                    if openLog {
+                        print("[WisdomSession]: ❌ Response - Error ❌")
+                        print("URL = \(url.absoluteString)")
+                        print(dictResponse)
+                        print("----------------------------------------")
+                    }
+                    
+                    if Self.responseable != nil {
+                        var processed = false
+                        // 全局 -> responseable
+                        if let able = Self.responseable, let failed = able.response(code: codeValue,
+                                                                                    message: msg ?? "",
+                                                                                    responseData: data) {
+                            processed = true
+                            failedClosure(failed.code, failed.message, "\(data)")
+                        }
+
+                        if processed == false {
+                            failedClosure(codeValue, msg ?? "", "\(data)")
+                        }
+                    }else {
+                        failedClosure(codeValue, msg ?? "", "\(data)")
+                    }
+                    return
+                }
+            }
+            
+            Self.result(code: codeValue, msg: msg ?? "", data: data as Any, succedClosure: succedClosure, failedClosure: failedClosure) { res in
+                if openLog {
+                    if res {
+                        print("[WisdomSession]: ✅ Response - Success ✅")
+                        print("URL = \(url.absoluteString)")
+                        print(dictResponse)
+                        print("------------------------------------------")
+                    }else {
+                        print("[WisdomSession]: ❌ Response - Error ❌")
+                        print("URL = \(url.absoluteString)")
+                        print(dictResponse)
+                        print("----------------------------------------")
+                    }
+                }
+            }
+        }
+    }
+    
+    
+    static func result(code: NSInteger,
+                       msg: String,
+                       data: Any,
+                       succedClosure: WisdomSessionSuccedClosure,
+                       failedClosure: WisdomSessionFailedClosure,
+                       resultClosure: ((Bool)->())?=nil) {
+        // 全局 -> responseable
+        if let responseable = Self.responseable, let failed = responseable.response(code: code,
+                                                                           message: msg,
+                                                                           responseData: data) {
+            resultClosure?(false)
+            failedClosure(failed.code, failed.message, "\(data)")
+        }else {
+            resultClosure?(true)
+            succedClosure(code, msg, data)
         }
     }
     
