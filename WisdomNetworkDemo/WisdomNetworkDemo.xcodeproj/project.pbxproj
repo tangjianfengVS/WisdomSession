@@ -13,6 +13,7 @@
 		34BFFEF22BA13B6100369CC1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 34BFFEF12BA13B6100369CC1 /* Assets.xcassets */; };
 		34BFFEF52BA13B6100369CC1 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 34BFFEF32BA13B6100369CC1 /* LaunchScreen.storyboard */; };
 		46803C3A2F361DE9406A9243 /* Pods_WisdomNetworkDemo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A39B2464D895094A27612E8 /* Pods_WisdomNetworkDemo.framework */; };
+		A58FA1242F2B45560006B3AC /* Source in Resources */ = {isa = PBXBuildFile; fileRef = A58FA1232F2B45560006B3AC /* Source */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -26,6 +27,7 @@
 		34BFFEF42BA13B6100369CC1 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		34BFFEF62BA13B6100369CC1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		9A39B2464D895094A27612E8 /* Pods_WisdomNetworkDemo.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_WisdomNetworkDemo.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		A58FA1232F2B45560006B3AC /* Source */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Source; path = ../../Source; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -61,6 +63,7 @@
 		34BFFEE72BA13B6000369CC1 /* WisdomNetworkDemo */ = {
 			isa = PBXGroup;
 			children = (
+				A58FA1232F2B45560006B3AC /* Source */,
 				34BFFEE82BA13B6000369CC1 /* AppDelegate.swift */,
 				34BFFEEC2BA13B6000369CC1 /* ViewController.swift */,
 				34BFFEEE2BA13B6000369CC1 /* Main.storyboard */,
@@ -151,6 +154,7 @@
 				34BFFEF52BA13B6100369CC1 /* LaunchScreen.storyboard in Resources */,
 				34BFFEF22BA13B6100369CC1 /* Assets.xcassets in Resources */,
 				34BFFEF02BA13B6000369CC1 /* Main.storyboard in Resources */,
+				A58FA1242F2B45560006B3AC /* Source in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

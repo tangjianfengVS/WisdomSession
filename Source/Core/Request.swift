@@ -6,9 +6,10 @@
 //
 
 import Foundation
+import Alamofire
 
 
-public struct WisdomSessionRequest {
+public class WisdomSessionRequest {
 
     public let url: String // 域名 + path
     
@@ -24,24 +25,23 @@ public struct WisdomSessionRequest {
     
     public let description: String
     
-    public let responseable: WisdomSessionResponseable.Type?
-    
     // MARK: Debug 环境下模拟数据。如果请求实现此属性 Debug 环境不在走网络数据，Release 环境自动忽略。
     // - code         : NSInteger
     // - message      : String
-    // - timestamp    : NSInteger 时间戳
     // - responseData : Any
     // - asyncTime    : TimeInterval 异步延迟
-    public let debugData: WisdomSessionDebugData?
+    public let responseDebugData: WisdomSessionDebugData?
+    
+    private var dataRequest: DataRequest?
+    
     
     /* url path 路径 初始化 */
     public init(path        : String,
                 method      : WisdomSessionMethod,
                 parameters  : [String:Any],
                 headers     : [String:String]?=nil,
-                debugData   : WisdomSessionDebugData?=nil,
-                responseable: WisdomSessionResponseable.Type?=nil,
-                desc        : String="") {
+                responseDebugData : WisdomSessionDebugData?=nil,
+                description : String="") {
         if let baseURL = WisdomSessionCore.baseURL, baseURL.count > 0{
             url = Self.getUrl(baseUrl: baseURL, urlPath: path)
             self.baseUrl = baseURL
@@ -52,11 +52,11 @@ public struct WisdomSessionRequest {
         self.method = method
         self.parameters = parameters
         self.headers = headers
-        self.debugData = debugData
-        self.responseable = responseable
-        description = desc
-        urlPath = path
+        self.responseDebugData = responseDebugData
+        self.description = description
+        self.urlPath = path
     }
+    
     
     /* baseUrl + url path 路径 初始化 */
     public init(baseUrl     : String,
@@ -64,22 +64,32 @@ public struct WisdomSessionRequest {
                 method      : WisdomSessionMethod,
                 parameters  : [String:Any],
                 headers     : [String:String]?=nil,
-                debugData   : WisdomSessionDebugData?=nil,
-                responseable: WisdomSessionResponseable.Type?=nil,
-                desc        : String="") {
+                responseDebugData : WisdomSessionDebugData?=nil,
+                description : String="") {
         url = Self.getUrl(baseUrl: baseUrl, urlPath: path)
         
         self.baseUrl = baseUrl
         self.method = method
         self.parameters = parameters
         self.headers = headers
-        self.debugData = debugData
-        self.responseable = responseable
-        description = desc
+        self.responseDebugData = responseDebugData
+        self.description = description
         urlPath = path
     }
     
-    private static func getUrl(baseUrl: String, urlPath: String) -> String {
+    
+    func setDataRequest(dataRequest: DataRequest?) {
+        self.dataRequest = dataRequest
+    }
+    
+
+    /* 停止当前网络请求 */
+    public func cancelSession() {
+        dataRequest?.cancel()
+    }
+    
+    
+    public static func getUrl(baseUrl: String, urlPath: String) -> String {
         let hasSuffix = baseUrl.hasSuffix("/")
         let hasPrefix = urlPath.hasPrefix("/")
         
