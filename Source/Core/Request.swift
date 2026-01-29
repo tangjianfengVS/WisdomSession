@@ -182,7 +182,7 @@ public class WisdomSessionUploadRequest {
     
 
     /* 停止当前网络请求 */
-    public func cancelUploadSession() {
+    public func cancelSession() {
         uploadRequest?.cancel()
     }
 }

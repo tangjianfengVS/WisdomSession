@@ -107,7 +107,7 @@ public extension WisdomSessionUploadApiable {
         self.uploadRequest = uploadRequest
     }
     
-    func cancelUploadSession() {
+    func cancelSession() {
         uploadRequest?.cancel()
     }
 }
