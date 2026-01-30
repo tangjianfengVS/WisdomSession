@@ -103,7 +103,7 @@ struct WisdomSessionCore {
             
             let dataRequest = Alamofire.AF.request(url, method: method, parameters: request.parameters, encoding: encoding, headers: headers, interceptor: nil).responseData { dataResponse in
 
-                Self.setResponseResult(url: url, openLog: openLog, dataResponse: dataResponse, succedClosure: succedClosure, failedClosure: failedClosure)
+                Self.setResponseResult(url: url, openLog: openLog, dataResponse: dataResponse, uploadDataResponse: nil, succedClosure: succedClosure, failedClosure: failedClosure)
             }
             
             request.setDataRequest(dataRequest: dataRequest)
@@ -125,11 +125,28 @@ struct WisdomSessionCore {
     
     static func setResponseResult(url: URL,
                                   openLog: Bool,
-                                  dataResponse: AFDataResponse<Data>,
+                                  dataResponse: AFDataResponse<Data>?,
+                                  uploadDataResponse: AFDataResponse<Data?>?,
                                   succedClosure: WisdomSessionSuccedClosure,
                                   failedClosure: WisdomSessionFailedClosure) {
-        switch dataResponse.result {
-        case .failure(let afError):
+        if let dataResponse {
+            switch dataResponse.result {
+            case .failure(let afError):
+                onSetFailure(afError: afError)
+            case .success(let data):
+                onSetSuccess(data: data)
+            }
+        }else if let uploadDataResponse {
+            switch uploadDataResponse.result {
+            case .failure(let afError):
+                onSetFailure(afError: afError)
+            case .success(let data):
+                onSetSuccess(data: data ?? Data())
+            }
+        }
+        
+        // 失败处理
+        func onSetFailure(afError: AFError) {
             var error = afError.errorDescription ?? "网络请求失败，请稍后重试"
             if "\(afError)".contains("Code=-1020") || "\(afError)".contains("Code=-1009") {
                 error = "网络连接错误，请检查网络"
@@ -146,24 +163,26 @@ struct WisdomSessionCore {
             }
             
             failedClosure(afError.responseCode ?? -1, error, "\(afError)")
-            
-        case .success(let data):
+        }
+        
+        // 成功处理
+        func onSetSuccess(data: Data) {
             let dictResponse = Self.encoderDict(data: data)
             let data = dictResponse[#keyPath(WisdomSession.data)] ?? ""
             var msg = dictResponse[#keyPath(WisdomSession.message)] as? String
             if msg == nil {
                 msg = (dictResponse[#keyPath(WisdomSession.msg)] as? String) ?? ""
             }
-            
+
             let code = dictResponse[#keyPath(WisdomSession.code)]
-            
+
             var codeValue: NSInteger = 0
             if let code_double = code as? Double {
                codeValue = NSInteger(code_double)
             }else if let code_integer = code as? NSInteger {
                codeValue = code_integer
             }
-            
+
             for error in WisdomSessionErrorStauts.allCases {
                 if error.rawValue == codeValue {
                     
@@ -183,7 +202,7 @@ struct WisdomSessionCore {
                             processed = true
                             failedClosure(failed.code, failed.message, "\(data)")
                         }
-
+                        
                         if processed == false {
                             failedClosure(codeValue, msg ?? "", "\(data)")
                         }

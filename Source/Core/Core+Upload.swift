@@ -120,11 +120,12 @@ extension WisdomSessionCore {
                 }
             }, to: url, method: method, headers: headers).response { dataResponse in
                 
-//                Self.setResponseResult(url: url,
-//                                       openLog: openLog,
-//                                       dataResponse: dataResponse,
-//                                       succedClosure: succedClosure,
-//                                       failedClosure: failedClosure)
+                Self.setResponseResult(url: url,
+                                       openLog: openLog,
+                                       dataResponse: nil,
+                                       uploadDataResponse: dataResponse,
+                                       succedClosure: succedClosure,
+                                       failedClosure: failedClosure)
             }
             
             request.setUploadRequest(uploadRequest: uploadRequest)
