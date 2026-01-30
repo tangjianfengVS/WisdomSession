@@ -101,7 +101,12 @@ extension WisdomSessionCore {
                                 let fileName = "voice_\(Int(Date().timeIntervalSince1970)).m4a"
                                 imageData.append(jsonData, withName: key, fileName: fileName, mimeType: "voice/m4a")
                             }
-                            
+                        // 视频文件
+                        }else if key == #keyPath(WisdomSession.video) {
+                            if let jsonData = value as? Data {
+                                let fileName = "video_\(Int(Date().timeIntervalSince1970)).mp4"
+                                imageData.append(jsonData, withName: key, fileName: fileName, mimeType: "video/mp4")
+                            }
                         // 图片文件
                         }else if key == #keyPath(WisdomSession.file) || key == #keyPath(WisdomSession.image) {
                             if let jsonData = value as? Data {
