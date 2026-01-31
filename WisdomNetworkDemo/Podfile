@@ -11,5 +11,5 @@ target 'WisdomNetworkDemo' do
   pod 'Alamofire', '5.8.0'
 
   #pod 'WisdomSession', :path=>"../"
-  
+   
 end
