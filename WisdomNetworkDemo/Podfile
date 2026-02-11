@@ -8,7 +8,7 @@ target 'WisdomNetworkDemo' do
   # Comment the next line if you don't want to use dynamic frameworks
 
   # Pods for WisdomNetworkDemo
-  pod 'Alamofire', '5.8.0'
+  pod 'Alamofire'
 
   #pod 'WisdomSession', :path=>"../"
    

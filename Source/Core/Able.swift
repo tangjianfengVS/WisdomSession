@@ -86,7 +86,7 @@ protocol WisdomSessionGlobalSetable {
 }
 
 
-protocol WisdomSessionInfoable where Self: WisdomSession {
+protocol WisdomSessionInfoable {// where Self: WisdomSession { // 循环引用
 
     static var baseURL: String? { get }
 

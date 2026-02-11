@@ -12,17 +12,17 @@ import Alamofire
 struct WisdomSessionCore {
     
     /* network domain */
-    private(set) static var baseURL: String?
+    nonisolated(unsafe) private(set) static var baseURL: String?
     
     /* network response result */
-    private(set) static var responseable: WisdomSessionResponseable.Type?
+    nonisolated(unsafe) private(set) static var responseable: WisdomSessionResponseable.Type?
     
     /* network timeout interval for request */
-    private(set) static var timeoutIntervalForRequest: TimeInterval = 45
+    nonisolated(unsafe) private(set) static var timeoutIntervalForRequest: TimeInterval = 45
     
-    private(set) static var openLog = true
+    nonisolated(unsafe) private(set) static var openLog = true
     
-    private(set) static var headersable: WisdomSessionHeadersable.Type?
+    nonisolated(unsafe) private(set) static var headersable: WisdomSessionHeadersable.Type?
 
     
     /* network requestable */
@@ -123,6 +123,7 @@ struct WisdomSessionCore {
     }
     
     
+    @MainActor
     static func setResponseResult(url: URL,
                                   openLog: Bool,
                                   dataResponse: AFDataResponse<Data>?,
@@ -146,6 +147,7 @@ struct WisdomSessionCore {
         }
         
         // 失败处理
+        @MainActor
         func onSetFailure(afError: AFError) {
             var error = afError.errorDescription ?? "网络请求失败，请稍后重试"
             if "\(afError)".contains("Code=-1020") || "\(afError)".contains("Code=-1009") {
@@ -166,6 +168,7 @@ struct WisdomSessionCore {
         }
         
         // 成功处理
+        @MainActor
         func onSetSuccess(data: Data) {
             let dictResponse = Self.encoderDict(data: data)
             let data = dictResponse[#keyPath(WisdomSession.data)] ?? ""
@@ -232,6 +235,7 @@ struct WisdomSessionCore {
     }
     
     
+    @MainActor
     static func result(code: NSInteger,
                        msg: String,
                        data: Any,

@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name      = 'WisdomSession'
-  s.version   = '0.1.0'
+  s.version   = '0.2.0'
   s.license   = { :type => "MIT", :file => "LICENSE" }
   s.authors   = { 'tangjianfeng' => '497609288@qq.com' }
   s.homepage  = 'https://github.com/tangjianfengVS/WisdomSession'
@@ -11,7 +11,7 @@ Pod::Spec.new do |s|
 
   s.platform      = :ios, '13.0'
   s.platform      = :osx, '10.15'
-  s.swift_version = ['5.6', '5.7', '5.8.1']
+  s.swift_version = ['5.5', '5.6', '5.7', '5.8', '5.9', '6.0']
 
   s.ios.deployment_target = '13.0'
   s.osx.deployment_target = '10.15'
