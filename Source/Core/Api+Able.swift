@@ -21,7 +21,7 @@ public protocol WisdomSessionable {
     var headers: [String:String]? { get }
 
     // MARK: The type of HTTP task to be performed. (设置请求体参数)
-    var parameters: [String:Any] { get }
+    var parameters: [String: any Sendable] { get }
     
     // The type of validation to perform on the request. Default is `.none`.
     //var validationType: ValidationType { get }
@@ -60,7 +60,7 @@ public extension WisdomSessionApiable {
 
     var headers: [String:String]? { nil }
 
-    var parameters: [String:Any] { [:] }
+    var parameters: [String: any Sendable] { [:] }
 
     var description: String { "" }
 
@@ -95,7 +95,7 @@ public extension WisdomSessionUploadApiable {
 
     var headers: [String:String]? { nil }
 
-    var parameters: [String:Any] { [:] }
+    var parameters: [String: any Sendable] { [:] }
 
     var description: String { "" }
 

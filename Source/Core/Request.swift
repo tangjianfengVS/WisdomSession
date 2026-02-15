@@ -19,7 +19,7 @@ public class WisdomSessionRequest {
     
     public let method: WisdomSessionMethod
     
-    public let parameters: [String:Any]
+    public let parameters: [String: any Sendable]
     
     public let headers: [String:String]?
     
@@ -38,7 +38,7 @@ public class WisdomSessionRequest {
     /* url path 路径 初始化 */
     public init(path        : String,
                 method      : WisdomSessionMethod,
-                parameters  : [String:Any],
+                parameters  : [String: any Sendable],
                 headers     : [String:String]?=nil,
                 responseDebugData : WisdomSessionDebugData?=nil,
                 description : String="") {
@@ -62,7 +62,7 @@ public class WisdomSessionRequest {
     public init(baseUrl     : String,
                 path        : String,
                 method      : WisdomSessionMethod,
-                parameters  : [String:Any],
+                parameters  : [String: any Sendable],
                 headers     : [String:String]?=nil,
                 responseDebugData : WisdomSessionDebugData?=nil,
                 description : String="") {
@@ -117,7 +117,7 @@ public class WisdomSessionUploadRequest {
     
     public let method: WisdomSessionUploadMethod
     
-    public let parameters: [String:Any]
+    public let parameters: [String: any Sendable]
     
     public let headers: [String:String]?
     
@@ -136,7 +136,7 @@ public class WisdomSessionUploadRequest {
     /* url path 路径 初始化 */
     public init(path        : String,
                 method      : WisdomSessionUploadMethod,
-                parameters  : [String:Any],
+                parameters  : [String: any Sendable],
                 headers     : [String:String]?=nil,
                 responseDebugData : WisdomSessionDebugData?=nil,
                 description : String="") {
@@ -160,7 +160,7 @@ public class WisdomSessionUploadRequest {
     public init(baseUrl     : String,
                 path        : String,
                 method      : WisdomSessionUploadMethod,
-                parameters  : [String:Any],
+                parameters  : [String: any Sendable],
                 headers     : [String:String]?=nil,
                 responseDebugData : WisdomSessionDebugData?=nil,
                 description : String="") {
