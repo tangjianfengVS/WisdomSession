@@ -125,12 +125,16 @@ extension WisdomSessionCore {
                 }
             }, to: url, method: method, headers: headers).response { dataResponse in
                 
-                Self.setResponseResult(url: url,
-                                       openLog: openLog,
-                                       dataResponse: nil,
-                                       uploadDataResponse: dataResponse,
-                                       succedClosure: succedClosure,
-                                       failedClosure: failedClosure)
+                nonisolated(unsafe) let unsafeResponse = dataResponse
+                
+                DispatchQueue.main.async(execute: {
+                    Self.setResponseResult(url: url,
+                                           openLog: openLog,
+                                           dataResponse: nil,
+                                           uploadDataResponse: unsafeResponse,
+                                           succedClosure: succedClosure,
+                                           failedClosure: failedClosure)
+                })
             }
             
             request.setUploadRequest(uploadRequest: uploadRequest)

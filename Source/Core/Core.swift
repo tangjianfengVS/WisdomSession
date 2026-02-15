@@ -103,7 +103,11 @@ struct WisdomSessionCore {
             
             let dataRequest = Alamofire.AF.request(url, method: method, parameters: request.parameters, encoding: encoding, headers: headers, interceptor: nil).responseData { dataResponse in
 
-                Self.setResponseResult(url: url, openLog: openLog, dataResponse: dataResponse, uploadDataResponse: nil, succedClosure: succedClosure, failedClosure: failedClosure)
+                nonisolated(unsafe) let unsafeResponse = dataResponse
+                
+                DispatchQueue.main.async(execute: {
+                    Self.setResponseResult(url: url, openLog: openLog, dataResponse: unsafeResponse, uploadDataResponse: nil, succedClosure: succedClosure, failedClosure: failedClosure)
+                })
             }
             
             request.setDataRequest(dataRequest: dataRequest)
@@ -171,7 +175,9 @@ struct WisdomSessionCore {
         @MainActor
         func onSetSuccess(data: Data) {
             let dictResponse = Self.encoderDict(data: data)
-            let data = dictResponse[#keyPath(WisdomSession.data)] ?? ""
+            let responseData = dictResponse[#keyPath(WisdomSession.data)] ?? ""
+            // 转为 Sendable 类型
+            let sendableData: any Sendable = "\(responseData)"
             var msg = dictResponse[#keyPath(WisdomSession.message)] as? String
             if msg == nil {
                 msg = (dictResponse[#keyPath(WisdomSession.msg)] as? String) ?? ""
@@ -201,22 +207,22 @@ struct WisdomSessionCore {
                         // 全局 -> responseable
                         if let able = Self.responseable, let failed = able.response(code: codeValue,
                                                                                     message: msg ?? "",
-                                                                                    responseData: data) {
+                                                                                    responseData: responseData) {
                             processed = true
-                            failedClosure(failed.code, failed.message, "\(data)")
+                            failedClosure(failed.code, failed.message, "\(responseData)")
                         }
-                        
+
                         if processed == false {
-                            failedClosure(codeValue, msg ?? "", "\(data)")
+                            failedClosure(codeValue, msg ?? "", "\(responseData)")
                         }
                     }else {
-                        failedClosure(codeValue, msg ?? "", "\(data)")
+                        failedClosure(codeValue, msg ?? "", "\(responseData)")
                     }
                     return
                 }
             }
             
-            Self.result(code: codeValue, msg: msg ?? "", data: data as Any, succedClosure: succedClosure, failedClosure: failedClosure) { res in
+            Self.result(code: codeValue, msg: msg ?? "", data: sendableData, succedClosure: succedClosure, failedClosure: failedClosure) { res in
                 if openLog {
                     if res {
                         print("[WisdomSession]: ✅ Response - Success ✅")
@@ -238,7 +244,7 @@ struct WisdomSessionCore {
     @MainActor
     static func result(code: NSInteger,
                        msg: String,
-                       data: Any,
+                       data: any Sendable,
                        succedClosure: WisdomSessionSuccedClosure,
                        failedClosure: WisdomSessionFailedClosure,
                        resultClosure: ((Bool)->())?=nil) {
