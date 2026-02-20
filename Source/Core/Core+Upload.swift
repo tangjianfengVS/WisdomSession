@@ -146,9 +146,12 @@ extension WisdomSessionCore {
                 print("Core Base URL = \(Self.baseURL ?? "")")
                 print("--------------------------------------------")
             }
-            
-            failedClosure(-1, "无效链接", "Request URL = \(request.url)" + "/Core Base URL = \(Self.baseURL ?? "")")
             request.setUploadRequest(uploadRequest: nil)
+            
+            let url = request.url
+            DispatchQueue.main.async(execute: {
+                failedClosure(-1, "无效链接", "Request URL = \(url)" + "/Core Base URL = \(Self.baseURL ?? "")")
+            })
             return nil
         }
     }

@@ -33,13 +33,13 @@ public enum WisdomSessionStatus {
 
 
 // MARK: 1.code: 响应码  2.message: 响应信息  3.responseData: 响应数据
-public typealias WisdomSessionSuccedClosure = @Sendable (_ code: NSInteger,
+public typealias WisdomSessionSuccedClosure = @MainActor (_ code: NSInteger,
                                                          _ message: String,
                                                          _ responseData: any Sendable)->()
 
 
 // MARK: 1.code: 错误码  2.message: 错误信息  3.rawResponseString: 原始信息
-public typealias WisdomSessionFailedClosure = @Sendable (_ code: NSInteger,
+public typealias WisdomSessionFailedClosure = @MainActor (_ code: NSInteger,
                                                          _ message: String,
                                                          _ rawResponseString: String)->()
 

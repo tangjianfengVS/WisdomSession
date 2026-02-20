@@ -51,7 +51,7 @@ public protocol WisdomSessionApiable: WisdomSessionable {
     var method: WisdomSessionMethod { get }
     
     // MARK: Session Start. (开启网络请求)
-    func request(succedClosure: @escaping WisdomSessionSuccedClosure, failedClosure: @escaping WisdomSessionFailedClosure)
+    mutating func request(succedClosure: @escaping WisdomSessionSuccedClosure, failedClosure: @escaping WisdomSessionFailedClosure)
     
 }
 
@@ -65,6 +65,11 @@ public extension WisdomSessionApiable {
     var description: String { "" }
 
     var responseDebugData: WisdomSessionDebugData? { nil }
+    
+    var dataRequest: DataRequest? {
+        set { dataRequest = newValue }
+        get { return dataRequest }
+    }
     
     mutating func request(succedClosure: @escaping WisdomSessionSuccedClosure, failedClosure: @escaping WisdomSessionFailedClosure) {
         let dataRequest = WisdomSession.request(clientable: self, succedClosure: succedClosure, failedClosure: failedClosure)
@@ -86,7 +91,7 @@ public protocol WisdomSessionUploadApiable: WisdomSessionable {
     var method: WisdomSessionUploadMethod { get }
     
     // MARK: Session Start. (开启网络请求)
-    func requestUpload(succedClosure: @escaping WisdomSessionSuccedClosure, failedClosure: @escaping WisdomSessionFailedClosure)
+    mutating func requestUpload(succedClosure: @escaping WisdomSessionSuccedClosure, failedClosure: @escaping WisdomSessionFailedClosure)
     
 }
 
@@ -100,6 +105,11 @@ public extension WisdomSessionUploadApiable {
     var description: String { "" }
 
     var responseDebugData: WisdomSessionDebugData? { nil }
+    
+    var uploadRequest: UploadRequest? {
+        set { uploadRequest = newValue }
+        get { return uploadRequest }
+    }
     
     mutating func requestUpload(succedClosure: @escaping WisdomSessionSuccedClosure, failedClosure: @escaping WisdomSessionFailedClosure) {
         let uploadRequest = WisdomSession.requestUpload(clientable: self, succedClosure: succedClosure, failedClosure: failedClosure)
