@@ -45,7 +45,7 @@ public protocol WisdomSessionable {
 // MARK: 设置网络请求，绑定协议实现
 public protocol WisdomSessionApiable: WisdomSessionable {
     
-    var dataRequest: DataRequest? { get set }
+    var dataRequest: Any? { get set }
 
     // MARK: The HTTP method used in the request. (设置请求方案)
     var method: WisdomSessionMethod { get }
@@ -66,18 +66,13 @@ public extension WisdomSessionApiable {
 
     var responseDebugData: WisdomSessionDebugData? { nil }
     
-    var dataRequest: DataRequest? {
-        set { dataRequest = newValue }
-        get { return dataRequest }
-    }
-    
     mutating func request(succedClosure: @escaping WisdomSessionSuccedClosure, failedClosure: @escaping WisdomSessionFailedClosure) {
         let dataRequest = WisdomSession.request(clientable: self, succedClosure: succedClosure, failedClosure: failedClosure)
         self.dataRequest = dataRequest
     }
     
     func cancelSession() {
-        dataRequest?.cancel()
+        (dataRequest as? DataRequest)?.cancel()
     }
 }
 
@@ -85,7 +80,7 @@ public extension WisdomSessionApiable {
 // MARK: 设置网络请求，绑定协议实现 - 文件上传
 public protocol WisdomSessionUploadApiable: WisdomSessionable {
     
-    var uploadRequest: UploadRequest? { get set }
+    var uploadRequest: Any? { get set }
 
     // MARK: The HTTP method used in the request. (设置请求方案)
     var method: WisdomSessionUploadMethod { get }
@@ -106,17 +101,12 @@ public extension WisdomSessionUploadApiable {
 
     var responseDebugData: WisdomSessionDebugData? { nil }
     
-    var uploadRequest: UploadRequest? {
-        set { uploadRequest = newValue }
-        get { return uploadRequest }
-    }
-    
     mutating func requestUpload(succedClosure: @escaping WisdomSessionSuccedClosure, failedClosure: @escaping WisdomSessionFailedClosure) {
         let uploadRequest = WisdomSession.requestUpload(clientable: self, succedClosure: succedClosure, failedClosure: failedClosure)
         self.uploadRequest = uploadRequest
     }
     
     func cancelSession() {
-        uploadRequest?.cancel()
+        (uploadRequest as? UploadRequest)?.cancel()
     }
 }
