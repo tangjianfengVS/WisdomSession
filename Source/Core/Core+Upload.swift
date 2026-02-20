@@ -61,7 +61,7 @@ extension WisdomSessionCore {
             if openLog {
                 print("[WisdomSession]: 🔥 Request - Start 🔥")
                 print("URL = \(url.absoluteString)")
-                print(request)
+                print("Request = \(request)")
                 print("---------------------------------------")
             }
             
@@ -71,7 +71,7 @@ extension WisdomSessionCore {
                     if openLog {
                         print("[WisdomSession]: ✅ DebugData - Success ✅")
                         print("URL = \(url.absoluteString)")
-                        print(debugData)
+                        print("DebugData = \(debugData)")
                         print("-------------------------------------------")
                     }
                     

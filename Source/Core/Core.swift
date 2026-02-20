@@ -72,7 +72,7 @@ struct WisdomSessionCore {
             if openLog {
                 print("[WisdomSession]: 🔥 Request - Start 🔥")
                 print("URL = \(url.absoluteString)")
-                print(request)
+                print("Request = \(request)")
                 print("---------------------------------------")
             }
             
@@ -82,7 +82,7 @@ struct WisdomSessionCore {
                     if openLog {
                         print("[WisdomSession]: ✅ DebugData - Success ✅")
                         print("URL = \(url.absoluteString)")
-                        print(debugData)
+                        print("DebugData = \(debugData)")
                         print("-------------------------------------------")
                     }
                     
@@ -167,7 +167,7 @@ struct WisdomSessionCore {
                 print("[WisdomSession]: ❌ Response - Error ❌")
                 print("URL = \(url.absoluteString)")
                 print("Error = \(error)")
-                print(afError)
+                print("AFError = \(afError)")
                 print("----------------------------------------")
             }
             
@@ -201,7 +201,7 @@ struct WisdomSessionCore {
                     if openLog {
                         print("[WisdomSession]: ❌ Response - Error ❌")
                         print("URL = \(url.absoluteString)")
-                        print(dictResponse)
+                        print("Response = \(dictResponse)")
                         print("----------------------------------------")
                     }
                     
@@ -230,12 +230,12 @@ struct WisdomSessionCore {
                     if res {
                         print("[WisdomSession]: ✅ Response - Success ✅")
                         print("URL = \(url.absoluteString)")
-                        print(dictResponse)
+                        print("Response = \(dictResponse)")
                         print("------------------------------------------")
                     }else {
                         print("[WisdomSession]: ❌ Response - Error ❌")
                         print("URL = \(url.absoluteString)")
-                        print(dictResponse)
+                        print("Response = \(dictResponse)")
                         print("----------------------------------------")
                     }
                 }
