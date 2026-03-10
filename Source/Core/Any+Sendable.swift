@@ -9,7 +9,7 @@ import Foundation
 
 
 // 封装 Any 为 Sendable 合规类型
-final public class WisdomSessionSafer: @unchecked Sendable {
+final public class WisdomSessionAny: @unchecked Sendable {
 
     private var _value: Any
     

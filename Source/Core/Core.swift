@@ -259,7 +259,7 @@ struct WisdomSessionCore {
             failedClosure(failed.code, failed.message, "\(data)")
         }else {
             resultClosure?(true)
-            succedClosure(code, msg, WisdomSessionSafer(value: data))
+            succedClosure(code, msg, WisdomSessionAny(value: data))
         }
     }
     
