@@ -9,7 +9,7 @@ import Foundation
 
 
 // 封装 Any 为 Sendable 合规类型
-public class WisdomSessionAny: @unchecked Sendable {
+public struct WisdomSessionAny: @unchecked Sendable {
 
     public var anyValue: Any
     
