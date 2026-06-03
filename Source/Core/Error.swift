@@ -7,12 +7,16 @@
 
 import Foundation
 
-public enum WisdomSessionErrorStauts: NSInteger, CaseIterable {
+public enum WisdomSessionErrorStatus: NSInteger, CaseIterable {
     case Unauthorized    = 401
     case Forbidden       = 402
     case NotFound        = 403
     case ServiceNotFound = 404
-    
+
     case ServerUnableToRespond = 500
     case ResourceUnavailable   = 503
 }
+
+// 兼容旧拼写（已废弃，请使用 WisdomSessionErrorStatus）
+@available(*, deprecated, renamed: "WisdomSessionErrorStatus")
+public typealias WisdomSessionErrorStauts = WisdomSessionErrorStatus

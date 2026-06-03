@@ -10,19 +10,51 @@ import Alamofire
 
 
 struct WisdomSessionCore {
-    
+
+    /* 保护全局可变配置的锁，避免读写数据竞争 */
+    private static let configLock = NSLock()
+
     /* network domain */
-    nonisolated(unsafe) private(set) static var baseURL: String?
-    
+    nonisolated(unsafe) private static var _baseURL: String?
+
     /* network response result */
-    nonisolated(unsafe) private(set) static var responseable: WisdomSessionResponseable.Type?
-    
+    nonisolated(unsafe) private static var _responseable: WisdomSessionResponseable.Type?
+
     /* network timeout interval for request */
-    nonisolated(unsafe) private(set) static var timeoutIntervalForRequest: TimeInterval = 45
-    
-    nonisolated(unsafe) private(set) static var openLog = true
-    
-    nonisolated(unsafe) private(set) static var headersable: WisdomSessionHeadersable.Type?
+    nonisolated(unsafe) private static var _timeoutIntervalForRequest: TimeInterval = 45
+
+    nonisolated(unsafe) private static var _openLog = true
+
+    nonisolated(unsafe) private static var _headersable: WisdomSessionHeadersable.Type?
+
+
+    /* network domain */
+    static var baseURL: String? {
+        configLock.lock(); defer { configLock.unlock() }
+        return _baseURL
+    }
+
+    /* network response result */
+    static var responseable: WisdomSessionResponseable.Type? {
+        configLock.lock(); defer { configLock.unlock() }
+        return _responseable
+    }
+
+    /* network timeout interval for request */
+    static var timeoutIntervalForRequest: TimeInterval {
+        configLock.lock(); defer { configLock.unlock() }
+        return _timeoutIntervalForRequest
+    }
+
+    static var openLog: Bool {
+        configLock.lock(); defer { configLock.unlock() }
+        return _openLog
+    }
+
+    static var headersable: WisdomSessionHeadersable.Type? {
+        configLock.lock(); defer { configLock.unlock() }
+        return _headersable
+    }
 
     
     /* network requestable */
@@ -65,9 +97,9 @@ struct WisdomSessionCore {
                 encoding = URLEncoding.default
             }
             
-            Alamofire.AF.sessionConfiguration.timeoutIntervalForRequest = Self.timeoutIntervalForRequest
-            Alamofire.AF.sessionConfiguration.headers = .default
-            
+            // 通过 requestModifier 设置单次请求超时（直接改 AF.sessionConfiguration 对已创建的 session 无效）
+            let timeout = Self.timeoutIntervalForRequest
+
             let openLog = Self.openLog
             if openLog {
                 print("[WisdomSession]: 🔥 Request - Start 🔥")
@@ -101,7 +133,7 @@ struct WisdomSessionCore {
             }
             #endif
             
-            let dataRequest = Alamofire.AF.request(url, method: method, parameters: request.parameters, encoding: encoding, headers: headers, interceptor: nil).responseData { dataResponse in
+            let dataRequest = Alamofire.AF.request(url, method: method, parameters: request.parameters, encoding: encoding, headers: headers, interceptor: nil, requestModifier: { $0.timeoutInterval = timeout }).responseData { dataResponse in
 
                 nonisolated(unsafe) let unsafeResponse = dataResponse
                 
@@ -178,6 +210,20 @@ struct WisdomSessionCore {
         @MainActor
         func onSetSuccess(data: Data) {
             let dictResponse = Self.encoderDict(data: data)
+
+            // 响应体非空但无法解析为 JSON 对象，视为失败，避免被静默当作成功
+            if dictResponse.isEmpty && !data.isEmpty {
+                let raw = String(data: data, encoding: .utf8) ?? ""
+                if openLog {
+                    print("[WisdomSession]: ❌ Response - Parse - Error ❌")
+                    print("URL = \(url.absoluteString)")
+                    print("Raw = \(raw)")
+                    print("----------------------------------------")
+                }
+                failedClosure(-1, "数据解析失败", raw)
+                return
+            }
+
             let responseData = dictResponse[#keyPath(WisdomSession.data)] ?? ""
             // 转为 Sendable 类型
             let sendableData: any Sendable = "\(responseData)"
@@ -195,7 +241,7 @@ struct WisdomSessionCore {
                codeValue = code_integer
             }
 
-            for error in WisdomSessionErrorStauts.allCases {
+            for error in WisdomSessionErrorStatus.allCases {
                 if error.rawValue == codeValue {
                     
                     if openLog {
@@ -282,23 +328,28 @@ struct WisdomSessionCore {
 extension WisdomSessionCore: WisdomSessionGlobalSetable {
     
     static func setSession(baseURL: String) {
-        Self.baseURL = baseURL
+        configLock.lock(); defer { configLock.unlock() }
+        _baseURL = baseURL
     }
-    
+
     static func setSession(responseable: WisdomSessionResponseable.Type) {
-        Self.responseable = responseable
+        configLock.lock(); defer { configLock.unlock() }
+        _responseable = responseable
     }
-    
+
     static func setSession(requestTimeoutInterval: TimeInterval)  {
-        Self.timeoutIntervalForRequest = requestTimeoutInterval
+        configLock.lock(); defer { configLock.unlock() }
+        _timeoutIntervalForRequest = requestTimeoutInterval
     }
-    
+
     static func setSession(openLog: Bool) {
-        Self.openLog = openLog
+        configLock.lock(); defer { configLock.unlock() }
+        _openLog = openLog
     }
-    
+
     public static func setSession(headersable: WisdomSessionHeadersable.Type) {
-        Self.headersable = headersable
+        configLock.lock(); defer { configLock.unlock() }
+        _headersable = headersable
     }
 }
 
@@ -306,12 +357,11 @@ extension WisdomSessionCore: WisdomSessionGlobalSetable {
 extension WisdomSessionCore: WisdomSessionEncoderable {
     
     static func encoderJson(dict: [String : Any]) -> String {
-        let data = try? JSONSerialization.data(withJSONObject: dict, options: [])
-        let strJson = String(data: data!, encoding: String.Encoding.utf8)
-        if strJson == nil {
+        guard let data = try? JSONSerialization.data(withJSONObject: dict, options: []),
+              let strJson = String(data: data, encoding: String.Encoding.utf8) else {
             return ""
         }
-        return strJson!
+        return strJson
     }
     
     static func encoderDict(data: Data) -> [String : Any] {

@@ -54,9 +54,9 @@ extension WisdomSessionCore {
                 method = .post
             }
             
-            //Alamofire.AF.sessionConfiguration.timeoutIntervalForRequest = Self.timeoutIntervalForRequest
-            //Alamofire.AF.sessionConfiguration.headers = .default
-            
+            // 通过 requestModifier 设置单次请求超时（直接改 AF.sessionConfiguration 对已创建的 session 无效）
+            let timeout = Self.timeoutIntervalForRequest
+
             let openLog = Self.openLog
             if openLog {
                 print("[WisdomSession]: 🔥 Request - Start 🔥")
@@ -111,7 +111,7 @@ extension WisdomSessionCore {
                         }else if key == #keyPath(WisdomSession.file) || key == #keyPath(WisdomSession.image) {
                             if let jsonData = value as? Data {
                                 let formatter = DateFormatter()
-                                formatter.dateFormat = #keyPath(WisdomSession.yyyyMMddHHmmss)
+                                formatter.dateFormat = "yyyyMMddHHmmss"
                                 let fileName = "\(formatter.string(from: Date())).png"
                                 imageData.append(jsonData, withName: key, fileName: fileName, mimeType: "image/png")
                             }
@@ -123,7 +123,7 @@ extension WisdomSessionCore {
                         }
                     }
                 }
-            }, to: url, method: method, headers: headers).response { dataResponse in
+            }, to: url, method: method, headers: headers, requestModifier: { $0.timeoutInterval = timeout }).response { dataResponse in
                 
                 nonisolated(unsafe) let unsafeResponse = dataResponse
                 
