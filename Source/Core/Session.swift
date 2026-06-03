@@ -28,8 +28,6 @@ public class WisdomSession: WisdomSessionInfoable {
     @objc var voice: String?
     
     @objc var video: String?
-    
-    @objc var yyyyMMddHHmmss: String?
 
 
     // MARK: 查看全局 baseURL
