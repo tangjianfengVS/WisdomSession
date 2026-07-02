@@ -135,7 +135,7 @@ struct WisdomSessionCore {
             
             let dataRequest = Alamofire.AF.request(url, method: method, parameters: request.parameters, encoding: encoding, headers: headers, interceptor: nil, requestModifier: { $0.timeoutInterval = timeout }).responseData { dataResponse in
 
-                nonisolated(unsafe) let unsafeResponse = dataResponse
+                let unsafeResponse = dataResponse
                 
                 DispatchQueue.main.async(execute: {
                     Self.setResponseResult(url: url, openLog: openLog, dataResponse: unsafeResponse, uploadDataResponse: nil, succedClosure: succedClosure, failedClosure: failedClosure)
@@ -225,7 +225,7 @@ struct WisdomSessionCore {
             }
             
             let resData = dictResponse[#keyPath(WisdomSession.data)]
-            let responseData: Any = resData == nil ? dictResponse : resData! // Bug: 修复Data字段为空，直接返回原数据
+            let responseData: Any = resData != nil ? resData! : encoderJson(dict: dictResponse) // Bug: 修复Data字段为空，直接返回原数据
   
             // 转为 Sendable 类型
             let sendableData: any Sendable = "\(responseData)"
