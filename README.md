@@ -13,4 +13,4 @@
  
          4. 支持 响应数据 局部/全局 拦截处理错误。
 
-      cocoapods 集成：pod 'WisdomSession', '0.1.8'
+      cocoapods 集成：pod 'WisdomSession', '0.1.9'
