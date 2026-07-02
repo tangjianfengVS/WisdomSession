@@ -135,7 +135,7 @@ struct WisdomSessionCore {
             
             let dataRequest = Alamofire.AF.request(url, method: method, parameters: request.parameters, encoding: encoding, headers: headers, interceptor: nil, requestModifier: { $0.timeoutInterval = timeout }).responseData { dataResponse in
 
-                let unsafeResponse = dataResponse
+                nonisolated(unsafe) let unsafeResponse = dataResponse
                 
                 DispatchQueue.main.async(execute: {
                     Self.setResponseResult(url: url, openLog: openLog, dataResponse: unsafeResponse, uploadDataResponse: nil, succedClosure: succedClosure, failedClosure: failedClosure)
