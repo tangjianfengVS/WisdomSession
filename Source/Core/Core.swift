@@ -225,10 +225,10 @@ struct WisdomSessionCore {
             }
             
             let resData = dictResponse[#keyPath(WisdomSession.data)]
-            let responseData: Any = resData != nil ? resData! : encoderJson(dict: dictResponse) // Bug: 修复Data字段为空，直接返回原数据
+            let responseData: any Sendable = resData != nil ? "\(resData!)" : encoderJson(dict: dictResponse) // Bug: 修复Data字段为空，直接返回原数据
   
             // 转为 Sendable 类型
-            let sendableData: any Sendable = "\(responseData)"
+            let sendableData: any Sendable = responseData
             var msg = dictResponse[#keyPath(WisdomSession.message)] as? String
             if msg == nil {
                 msg = (dictResponse[#keyPath(WisdomSession.msg)] as? String) ?? ""
