@@ -223,8 +223,10 @@ struct WisdomSessionCore {
                 failedClosure(-1, "数据解析失败", raw)
                 return
             }
-
-            let responseData = dictResponse[#keyPath(WisdomSession.data)] ?? ""
+            
+            let resData = dictResponse[#keyPath(WisdomSession.data)]
+            let responseData: Any = resData == nil ? dictResponse : resData! // Bug: 修复Data字段为空，直接返回原数据
+  
             // 转为 Sendable 类型
             let sendableData: any Sendable = "\(responseData)"
             var msg = dictResponse[#keyPath(WisdomSession.message)] as? String
