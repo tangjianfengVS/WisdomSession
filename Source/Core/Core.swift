@@ -95,6 +95,10 @@ struct WisdomSessionCore {
             var encoding: ParameterEncoding = JSONEncoding.default
             if method == .get {
                 encoding = URLEncoding.default
+            } else if let contentType = request_headers.first(where: { $0.key.caseInsensitiveCompare("Content-Type") == .orderedSame })?.value,
+                      contentType.lowercased().contains("application/x-www-form-urlencoded") {
+                // Content-Type 显式声明为表单编码时，body 用 key1=value1&key2=value2 而不是 JSON
+                encoding = URLEncoding.httpBody
             }
             
             // 通过 requestModifier 设置单次请求超时（直接改 AF.sessionConfiguration 对已创建的 session 无效）
